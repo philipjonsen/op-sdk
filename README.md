@@ -1,16 +1,18 @@
-# Anchor.js
+# Olympus-Terra.js
 
-Anchor.js is a client SDK for building applications that can interact with Anchor Protocol from within JavaScript runtimes, such as web browsers, server backends, and on mobile through React Native.
+Olympus-Terra.js is a client SDK for building applications that can interact with Olympus Protocol from within JavaScript runtimes, such as web browsers, server backends, and on mobile through React Native.
 
-You can find a reference of the Anchor.js API [here](https://anchor-protocol.github.io/anchor.js/).
+<!-- TODO (appleseed) replace link -->
+You can find a reference of the Olympus-Terra.js API [here](https://anchor-protocol.github.io/anchor.js/).
 
-## Getting Anchor.js
+## Getting Olympus-Terra.js
 
-Anchor.js is available as a package on NPM and is intended to be used alongside Terra.js.
+Olympus-Terra.js is available as a package on NPM and is intended to be used alongside Terra.js.
 
 Add both:
 
 - `@terra-money/terra.js`
+<!-- TODO (appleseed) make deployable -->
 - `@anchor-protocol/anchor.js`
 
 To your JavaScript project's `package.json` as dependencies using your preferred package manager:
@@ -24,11 +26,11 @@ $ npm install -S @terra-money/terra.js @anchor-protocol/anchor.js
 
 ### Using Facades
 
-Anchor.js provides class wrapper facade for the usual operations available on [webapp](https://app.anchorprotocol.com).
+Olympus-Terra.js provides class wrapper facade for the usual operations available on [webapp](https://app.anchorprotocol.com).
 
 ```ts
 import { LCDClient, MnemonicKey, Fee, Wallet } from '@terra-money/terra.js'
-import { Anchor, columbus5, AddressProviderFromJson, MARKET_DENOMS, OperationGasParameters } from '@anchor-protocol/anchor.js'
+import { Olympus, columbus5, AddressProviderFromJson, MARKET_DENOMS, OperationGasParameters } from '@olympus-dao/Olympus-Terra.js'
 
 const addressProvider = new AddressProviderFromJson(columbus5)
 const lcd = new LCDClient({ URL: 'https://lcd.terra.dev', chainID: 'columbus-5' })
@@ -36,13 +38,13 @@ const key = new MnemonicKey({
   mnemonic: 'your key'
 })
 const wallet = new Wallet(lcd, key)
-const anchor = new Anchor(lcd, addressProvider)
+const olympus = new Olympus(lcd, addressProvider)
 
 // you can generate message only, using your wallet
-const msgs = anchor.earn.depositStable(MARKET_DENOMS.UUSD, "100.5000").generateWithWallet(wallet)
+const msgs = olympus.bond.depositAsset(amountOfDepositToken, maxPrice, depositorAddress).generateWithWallet(wallet)
 
 // you can ALSO generate message only, using your address in string
-const msgs = anchor.earn.depositStable(MARKET_DENOMS.UUSD, "100.5000").generateWithAddress("terra1...")
+const msgs = olympus.bond.depositAsset(amountOfDepositToken, maxPrice, depositorAddress).generateWithAddress("terra1...")
 
 // or, you can broadcast the tx using your wallet
 // below is the recommended default setting for gas parameters.
@@ -54,13 +56,13 @@ const gasParameters: OperationGasParameters = {
   // or if you want to fixate gas, you can use `fee`
   fee: new Fee(gasToSpend, "100000uusd")
 }
-const txResult = await anchor.earn.depositStable(MARKET_DENOMS.UUSD, "100.5000").execute(wallet, gasParameters)
+const txResult = await olympus.bond.depositAsset(amountOfDepositToken, maxPrice, depositorAddress).execute(wallet, gasParameters)
 ```
 
 
 ### Using Message Fabricators
 
-Anchor.js provides facilities for 2 main use cases:
+Olympus-Terra.js provides facilities for 2 main use cases:
 
 - query: runs smart contract queries through LCD
 - execute: creates proper `MsgExecuteContract` objects to be used in transactions
@@ -71,22 +73,20 @@ To Use the message fabricators:
 
 **Note**: Please note that `market` is a different variable from the coin denom. The denomination for the coins in the example is set to be `uusd`.
 ```ts
-import {fabricateRedeemStable, fabricateDepositStableCoin} from '@anchor-protocol/anchor.js';
+import {fabricateRedeemBond, fabricateDepositAsset} from '@anchor-protocol/anchor.js';
 import {AddressProviderFromJson} from "@anchor-protocol/anchor.js"; 
 
 // default -- uses bombay core contract addresses
 const addressMap = somehowGetAddresses();
 const addressProvider = new AddressProviderFromJson(addressMap);
-    const redeemMsg = fabricateRedeemStable({
-      address: 'terra123...',
-      market: 'usd',
-      amount: '10000',
+    const redeemMsg = fabricateRedeemBond({
+      depositor: 'terra123...',
     })(addressProvider);
 
-    const depositMsg = fabricateDepositStableCoin({
-      address: 'terra123...',
-      market: 'usd',
-      amount: '10',
+    const depositMsg = fabricateDepositAsset({
+      amount: 10,
+      max_price: 500
+      address: 'terra123...',      
     })(addressProvider);
 ```
 
@@ -96,20 +96,20 @@ A message fabricator contains functions for generating proper `MsgExecuteContrac
 ```ts
 import { LCDClient, Wallet, MnemonicKey, Fee} from '@terra-money/terra.js';
 
-const anchor = new LCDClient({ URL: 'https://bombay-lcd.terra.dev', chainID:'bombay-12' });
+const olympus = new LCDClient({ URL: 'https://bombay-lcd.terra.dev', chainID:'bombay-12' });
 const owner = new MnemonicKey({ mnemonic: "...."});
-const wallet = new Wallet(anchor, owner);
+const wallet = new Wallet(olympus, owner);
 
-async function depositStable() {
+async function depositAsset() {
     const tx = await wallet.createAndSignTx({
         msgs: depositMsg,
         fee: new Fee(2_000_000, { uluna: 2_000_000 })
     });
-    return await anchor.tx.broadcast(tx);
+    return await olympus.tx.broadcast(tx);
 }
 
 async function main() {
-  await depositStable()
+  await depositAsset()
     .then((result) => {
       console.log(result);
     })

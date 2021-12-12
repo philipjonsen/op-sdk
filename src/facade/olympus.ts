@@ -3,18 +3,18 @@ import { AddressProvider } from '../address-provider';
 import { AnchorToken } from './anchor-token/anchor-token';
 import { BLuna } from './bluna/bluna';
 import { Borrow } from './borrow/borrow';
-import { Earn } from './earn/earn';
+import { Bond } from './bond/bond';
 
 // the frontier
-export class Anchor {
+export class Olympus {
   // sub-facades
-  earn!: Earn;
+  bond!: Bond;
   borrow!: Borrow;
   bluna!: BLuna;
   anchorToken!: AnchorToken;
 
   constructor(lcd: LCDClient, addressProvider: AddressProvider) {
-    this.earn = new Earn(lcd, addressProvider);
+    this.bond = new Bond(lcd, addressProvider);
     this.borrow = new Borrow(lcd, addressProvider);
     this.bluna = new BLuna(lcd, addressProvider);
     this.anchorToken = new AnchorToken(lcd, addressProvider);
