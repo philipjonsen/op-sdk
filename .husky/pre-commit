@@ -4,4 +4,4 @@
 #(TODO: renable once tests are in place)
 #yarn test
 
-yarn run lint-staged
+#yarn run lint-staged
