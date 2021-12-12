@@ -1,16 +1,18 @@
-# Anchor.js
+# Olympus-Terra.js
 
-Anchor.js is a client SDK for building applications that can interact with Anchor Protocol from within JavaScript runtimes, such as web browsers, server backends, and on mobile through React Native.
+Olympus-Terra.js is a client SDK for building applications that can interact with Olympus Protocol from within JavaScript runtimes, such as web browsers, server backends, and on mobile through React Native.
 
-You can find a reference of the Anchor.js API [here](https://anchor-protocol.github.io/anchor.js/).
+<!-- TODO (appleseed) replace link -->
+You can find a reference of the Olympus-Terra.js API [here](https://anchor-protocol.github.io/anchor.js/).
 
-## Getting Anchor.js
+## Getting Olympus-Terra.js
 
-Anchor.js is available as a package on NPM and is intended to be used alongside Terra.js.
+Olympus-Terra.js is available as a package on NPM and is intended to be used alongside Terra.js.
 
 Add both:
 
 - `@terra-money/terra.js`
+<!-- TODO (appleseed) make deployable -->
 - `@anchor-protocol/anchor.js`
 
 To your JavaScript project's `package.json` as dependencies using your preferred package manager:
@@ -24,10 +26,11 @@ $ npm install -S @terra-money/terra.js @anchor-protocol/anchor.js
 
 ### Using Facades
 
-Anchor.js provides class wrapper facade for the usual operations available on [webapp](https://app.anchorprotocol.com).
+Olympus-Terra.js provides class wrapper facade for the usual operations available on [webapp](https://app.anchorprotocol.com).
 
 ```ts
 import { LCDClient, MnemonicKey, Fee, Wallet } from '@terra-money/terra.js'
+// TODO (Appleseed) - replace Anchor
 import { Anchor, columbus5, AddressProviderFromJson, MARKET_DENOMS, OperationGasParameters } from '@anchor-protocol/anchor.js'
 
 const addressProvider = new AddressProviderFromJson(columbus5)
@@ -36,6 +39,7 @@ const key = new MnemonicKey({
   mnemonic: 'your key'
 })
 const wallet = new Wallet(lcd, key)
+// TODO (Appleseed) - replace Anchor
 const anchor = new Anchor(lcd, addressProvider)
 
 // you can generate message only, using your wallet
@@ -60,7 +64,7 @@ const txResult = await anchor.earn.depositStable(MARKET_DENOMS.UUSD, "100.5000")
 
 ### Using Message Fabricators
 
-Anchor.js provides facilities for 2 main use cases:
+Olympus-Terra.js provides facilities for 2 main use cases:
 
 - query: runs smart contract queries through LCD
 - execute: creates proper `MsgExecuteContract` objects to be used in transactions
