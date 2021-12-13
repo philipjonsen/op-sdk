@@ -41,10 +41,10 @@ const wallet = new Wallet(lcd, key)
 const olympus = new Olympus(lcd, addressProvider)
 
 // you can generate message only, using your wallet
-const msgs = olympus.bond.depositStableBond(MARKET_DENOMS.UUSD, "100.5000").generateWithWallet(wallet)
+const msgs = olympus.bond.depositStableBond(amountOfDepositToken, maxPrice, depositorAddress).generateWithWallet(wallet)
 
 // you can ALSO generate message only, using your address in string
-const msgs = olympus.bond.depositStableBond(MARKET_DENOMS.UUSD, "100.5000").generateWithAddress("terra1...")
+const msgs = olympus.bond.depositStableBond(amountOfDepositToken, maxPrice, depositorAddress).generateWithAddress("terra1...")
 
 // or, you can broadcast the tx using your wallet
 // below is the recommended default setting for gas parameters.
@@ -56,7 +56,7 @@ const gasParameters: OperationGasParameters = {
   // or if you want to fixate gas, you can use `fee`
   fee: new Fee(gasToSpend, "100000uusd")
 }
-const txResult = await olympus.bond.depositStableBond(MARKET_DENOMS.UUSD, "100.5000").execute(wallet, gasParameters)
+const txResult = await olympus.bond.depositStableBond(amountOfDepositToken, maxPrice, depositorAddress).execute(wallet, gasParameters)
 ```
 
 
