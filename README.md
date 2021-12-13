@@ -41,10 +41,10 @@ const wallet = new Wallet(lcd, key)
 const olympus = new Olympus(lcd, addressProvider)
 
 // you can generate message only, using your wallet
-const msgs = olympus.bond.depositStableBond(amountOfDepositToken, maxPrice, depositorAddress).generateWithWallet(wallet)
+const msgs = olympus.bond.depositAsset(amountOfDepositToken, maxPrice, depositorAddress).generateWithWallet(wallet)
 
 // you can ALSO generate message only, using your address in string
-const msgs = olympus.bond.depositStableBond(amountOfDepositToken, maxPrice, depositorAddress).generateWithAddress("terra1...")
+const msgs = olympus.bond.depositAsset(amountOfDepositToken, maxPrice, depositorAddress).generateWithAddress("terra1...")
 
 // or, you can broadcast the tx using your wallet
 // below is the recommended default setting for gas parameters.
@@ -56,7 +56,7 @@ const gasParameters: OperationGasParameters = {
   // or if you want to fixate gas, you can use `fee`
   fee: new Fee(gasToSpend, "100000uusd")
 }
-const txResult = await olympus.bond.depositStableBond(amountOfDepositToken, maxPrice, depositorAddress).execute(wallet, gasParameters)
+const txResult = await olympus.bond.depositAsset(amountOfDepositToken, maxPrice, depositorAddress).execute(wallet, gasParameters)
 ```
 
 
@@ -73,17 +73,17 @@ To Use the message fabricators:
 
 **Note**: Please note that `market` is a different variable from the coin denom. The denomination for the coins in the example is set to be `uusd`.
 ```ts
-import {fabricateRedeemStable, fabricateDepositStableCoin} from '@anchor-protocol/anchor.js';
+import {fabricateRedeemBond, fabricateDepositAsset} from '@anchor-protocol/anchor.js';
 import {AddressProviderFromJson} from "@anchor-protocol/anchor.js"; 
 
 // default -- uses bombay core contract addresses
 const addressMap = somehowGetAddresses();
 const addressProvider = new AddressProviderFromJson(addressMap);
-    const redeemMsg = fabricateRedeemStable({
+    const redeemMsg = fabricateRedeemBond({
       depositor: 'terra123...',
     })(addressProvider);
 
-    const depositMsg = fabricateDepositStableBond({
+    const depositMsg = fabricateDepositAsset({
       amount: 10,
       max_price: 500
       address: 'terra123...',      
@@ -100,7 +100,7 @@ const olympus = new LCDClient({ URL: 'https://bombay-lcd.terra.dev', chainID:'bo
 const owner = new MnemonicKey({ mnemonic: "...."});
 const wallet = new Wallet(olympus, owner);
 
-async function depositStableBond() {
+async function depositAsset() {
     const tx = await wallet.createAndSignTx({
         msgs: depositMsg,
         fee: new Fee(2_000_000, { uluna: 2_000_000 })
@@ -109,7 +109,7 @@ async function depositStableBond() {
 }
 
 async function main() {
-  await depositStableBond()
+  await depositAsset()
     .then((result) => {
       console.log(result);
     })

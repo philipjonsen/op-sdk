@@ -1,8 +1,8 @@
 import { Int, Dec, LCDClient } from '@terra-money/terra.js';
 import { AddressProvider, MARKET_DENOMS } from '../../address-provider';
 import {
-  fabricateDepositStableBond,
-  fabricateRedeemStableBond,
+  fabricateDepositAsset,
+  fabricateRedeemBond,
   OmitAddress,
   OptionType,
 } from '../../fabricators';
@@ -15,11 +15,11 @@ import { Operation, OperationImpl } from '../operation';
 import { BLOCKS_PER_YEAR } from '../../constants';
 
 // TODO (appleseed): fix for olympus
-export type BondDepositStableOption = OmitAddress<
-  OptionType<typeof fabricateDepositStableBond>
+export type BondDepositAsset = OmitAddress<
+  OptionType<typeof fabricateDepositAsset>
 >;
 export type BondWithdrawStableOption = OmitAddress<
-  OptionType<typeof fabricateRedeemStableBond>
+  OptionType<typeof fabricateRedeemBond>
 >;
 
 export interface GetTotalDepositOption {
@@ -40,18 +40,18 @@ export class Bond {
     this._addressProvider = addressProvider;
   }
 
-  depositStableBond(depositStableOption: BondDepositStableOption): Operation {
+  depositAsset(depositAsset: BondDepositAsset): Operation {
     return new OperationImpl(
-      fabricateDepositStableBond,
-      depositStableOption,
+      fabricateDepositAsset,
+      depositAsset,
       this._addressProvider,
     );
   }
 
-  redeemStableBond(redeemStableOption: BondWithdrawStableOption): Operation {
+  redeemBond(redeemBondOption: BondWithdrawStableOption): Operation {
     return new OperationImpl(
-      fabricateRedeemStableBond,
-      redeemStableOption,
+      fabricateRedeemBond,
+      redeemBondOption,
       this._addressProvider,
     );
   }
