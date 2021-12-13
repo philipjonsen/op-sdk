@@ -11,7 +11,7 @@ interface Response {
   a: unknown;
 }
 
-export const queryDebt =
+export const queryCurrentDebt =
   ({ lcd, contract_address }: Option) =>
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (_: AddressProvider): Promise<Response> => {
