@@ -4,20 +4,13 @@ import { validateInput } from '../../utils/validate-input';
 import { validateAddress } from '../../utils/validation/address';
 import { validateIsNumber } from '../../utils/validation/number';
 
-export enum BondTermParameter {
-  Vesting = 'vesting',
-  Payout = 'payout',
-  Debt = 'debt',
-}
-
 interface Option {
   address: string;
-  parameter: BondTermParameter;
-  input: number;
+  depositor: string;
 }
 
-export const fabricateSetBondTerms =
-  ({ address, parameter, input }: Option) =>
+export const fabricateRedeem =
+  ({ address, olympus_treasury }: Option) =>
   (addressProvider: AddressProvider): MsgExecuteContract[] => {
     validateInput([validateAddress(address)]);
 
