@@ -8,17 +8,23 @@ interface Option {
 }
 
 //(TODO) (aphex) needs to be filled
-interface Response {
-  a: unknown;
+interface BondInfoResponse {
+  payout: number;
+  vesting: number;
+  last_time: number;
+  true_price_paid: number;
 }
 
-export const queryPayoutFor =
+export const queryBondInfo =
   ({ lcd, contract_address, user }: Option) =>
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async (_: AddressProvider): Promise<Response> => {
-    const response: Response = await lcd.wasm.contractQuery(contract_address, {
-      //TODO: (aphex) check if this is correct
-      user,
-    });
+  async (_: AddressProvider): Promise<BondInfoResponse> => {
+    const response: BondInfoResponse = await lcd.wasm.contractQuery(
+      contract_address,
+      {
+        //TODO: (aphex) check if this is correct
+        user,
+      },
+    );
     return response;
   };
