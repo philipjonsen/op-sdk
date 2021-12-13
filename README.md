@@ -30,8 +30,7 @@ Olympus-Terra.js provides class wrapper facade for the usual operations availabl
 
 ```ts
 import { LCDClient, MnemonicKey, Fee, Wallet } from '@terra-money/terra.js'
-// TODO (Appleseed) - replace Anchor
-import { Anchor, columbus5, AddressProviderFromJson, MARKET_DENOMS, OperationGasParameters } from '@anchor-protocol/anchor.js'
+import { Olympus, columbus5, AddressProviderFromJson, MARKET_DENOMS, OperationGasParameters } from '@olympus-dao/Olympus-Terra.js'
 
 const addressProvider = new AddressProviderFromJson(columbus5)
 const lcd = new LCDClient({ URL: 'https://lcd.terra.dev', chainID: 'columbus-5' })
@@ -39,14 +38,13 @@ const key = new MnemonicKey({
   mnemonic: 'your key'
 })
 const wallet = new Wallet(lcd, key)
-// TODO (Appleseed) - replace Anchor
-const anchor = new Anchor(lcd, addressProvider)
+const olympus = new Olympus(lcd, addressProvider)
 
 // you can generate message only, using your wallet
-const msgs = anchor.earn.depositStable(MARKET_DENOMS.UUSD, "100.5000").generateWithWallet(wallet)
+const msgs = olympus.bond.depositStableBond(MARKET_DENOMS.UUSD, "100.5000").generateWithWallet(wallet)
 
 // you can ALSO generate message only, using your address in string
-const msgs = anchor.earn.depositStable(MARKET_DENOMS.UUSD, "100.5000").generateWithAddress("terra1...")
+const msgs = olympus.bond.depositStableBond(MARKET_DENOMS.UUSD, "100.5000").generateWithAddress("terra1...")
 
 // or, you can broadcast the tx using your wallet
 // below is the recommended default setting for gas parameters.
@@ -58,7 +56,7 @@ const gasParameters: OperationGasParameters = {
   // or if you want to fixate gas, you can use `fee`
   fee: new Fee(gasToSpend, "100000uusd")
 }
-const txResult = await anchor.earn.depositStable(MARKET_DENOMS.UUSD, "100.5000").execute(wallet, gasParameters)
+const txResult = await olympus.bond.depositStableBond(MARKET_DENOMS.UUSD, "100.5000").execute(wallet, gasParameters)
 ```
 
 
@@ -100,20 +98,20 @@ A message fabricator contains functions for generating proper `MsgExecuteContrac
 ```ts
 import { LCDClient, Wallet, MnemonicKey, Fee} from '@terra-money/terra.js';
 
-const anchor = new LCDClient({ URL: 'https://bombay-lcd.terra.dev', chainID:'bombay-12' });
+const olympus = new LCDClient({ URL: 'https://bombay-lcd.terra.dev', chainID:'bombay-12' });
 const owner = new MnemonicKey({ mnemonic: "...."});
-const wallet = new Wallet(anchor, owner);
+const wallet = new Wallet(olympus, owner);
 
-async function depositStable() {
+async function depositStableBond() {
     const tx = await wallet.createAndSignTx({
         msgs: depositMsg,
         fee: new Fee(2_000_000, { uluna: 2_000_000 })
     });
-    return await anchor.tx.broadcast(tx);
+    return await olympus.tx.broadcast(tx);
 }
 
 async function main() {
-  await depositStable()
+  await depositStableBond()
     .then((result) => {
       console.log(result);
     })
