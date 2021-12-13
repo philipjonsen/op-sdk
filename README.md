@@ -80,15 +80,13 @@ import {AddressProviderFromJson} from "@anchor-protocol/anchor.js";
 const addressMap = somehowGetAddresses();
 const addressProvider = new AddressProviderFromJson(addressMap);
     const redeemMsg = fabricateRedeemStable({
-      address: 'terra123...',
-      market: 'usd',
-      amount: '10000',
+      depositor: 'terra123...',
     })(addressProvider);
 
-    const depositMsg = fabricateDepositStableCoin({
-      address: 'terra123...',
-      market: 'usd',
-      amount: '10',
+    const depositMsg = fabricateDepositStableBond({
+      amount: 10,
+      max_price: 500
+      address: 'terra123...',      
     })(addressProvider);
 ```
 
