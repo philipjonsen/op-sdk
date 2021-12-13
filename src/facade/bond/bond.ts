@@ -8,7 +8,8 @@ import {
 } from '../../fabricators';
 import {
   queryMarketEpochState,
-  queryOverseerEpochState,
+  queryMaxPayout,
+  queryBondInfo,
   queryTokenBalance,
 } from '../../queries';
 import { Operation, OperationImpl } from '../operation';
@@ -22,9 +23,13 @@ export type BondWithdrawStableOption = OmitAddress<
   OptionType<typeof fabricateRedeemBond>
 >;
 
-export interface GetTotalDepositOption {
-  market: MARKET_DENOMS;
+export interface GetBondInfoOption {
   address: string;
+}
+
+// TODO (appleseed): should this be number? BigNumber on evm pro
+export interface GetPayoutForOption {
+  tokenAmount: string;
 }
 
 export interface GetApyOption {
@@ -56,31 +61,76 @@ export class Bond {
     );
   }
 
-  async getTotalDeposit(
-    getTotalDepositOption: GetTotalDepositOption,
+  async getBondInfo(
+    getBondInfoOption: GetBondInfoOption,
   ): Promise<string> {
-    const epochState = await queryMarketEpochState({
-      lcd: this._lcd,
-      market: getTotalDepositOption.market,
-    })(this._addressProvider);
-    const userATerraBalance = await queryTokenBalance({
-      lcd: this._lcd,
-      address: getTotalDepositOption.address,
-      token_address: this._addressProvider.aTerra(getTotalDepositOption.market),
-    })(this._addressProvider);
+    // const epochState = await queryMarketEpochState({
+    //   lcd: this._lcd,
+    //   market: getBondInfoOption.market,
+    // })(this._addressProvider);
+    // const userATerraBalance = await d({
+    //   lcd: this._lcd,
+    //   address: getBondInfoOption.address,
+    //   token_address: this._addressProvider.aTerra(getBondInfoOption.market),
+    // })(this._addressProvider);
 
-    return new Int(
-      new Dec(epochState.exchange_rate).mul(userATerraBalance.balance),
-    )
-      .div(1000000)
-      .toString();
+    // return new Int(
+    //   new Dec(epochState.exchange_rate).mul(userATerraBalance.balance),
+    // )
+    //   .div(1000000)
+    //   .toString();
+    return await queryBondInfo({
+      lcd: this._lcd,
+      address: getBondInfoOption.address,
+    })(this._addressProvider);
   }
 
-  async getAPY(getAPYOption: GetApyOption): Promise<number> {
-    const epochState = await queryOverseerEpochState({
+  // TODO (appleseed): what's the return value (number on evm pro)
+  async getMaxPayout(): Promise<number> {
+    const maxPayout = await queryMaxPayout({
       lcd: this._lcd,
-      ...getAPYOption,
     })(this._addressProvider);
-    return new Dec(epochState.deposit_rate).mul(BLOCKS_PER_YEAR).toNumber();
+    return maxPayout.toNumber();
   }
+
+  // TODO (appleseed): what's the return value (number on evm pro)
+  async getPayoutFor(getPayoutForOption: GetPayoutForOption): Promise<number> {
+    const payoutFor = await queryPayoutFor({
+      lcd: this._lcd,
+      token_amount: getPayoutForOption.tokenAmount,
+    })(this._addressProvider);
+    return payoutFor.toNumber();
+  }
+
+    // TODO (appleseed): what's the return value (number on evm pro)
+    async getCurrentDebt(): Promise<number> {
+      const currentDebt = await queryCurrentDebt({
+        lcd: this._lcd,
+      })(this._addressProvider);
+      return currentDebt.toNumber();
+    }
+
+    // TODO (appleseed): what's the return value (number on evm pro)
+    async getDebtRatio(): Promise<number> {
+      const debtRatio = await queryDebtRatio({
+        lcd: this._lcd,
+      })(this._addressProvider);
+      return debtRatio.toNumber();
+    }
+
+    // TODO (appleseed): what's the return value (number on evm pro)
+    async getTrueBondPrice(): Promise<number> {
+      const trueBondPrice = await queryTrueBondPrice({
+        lcd: this._lcd,
+      })(this._addressProvider);
+      return trueBondPrice.toNumber();
+    }
+
+  // async getAPY(getAPYOption: GetApyOption): Promise<number> {
+  //   const epochState = await queryOverseerEpochState({
+  //     lcd: this._lcd,
+  //     ...getAPYOption,
+  //   })(this._addressProvider);
+  //   return new Dec(epochState.deposit_rate).mul(BLOCKS_PER_YEAR).toNumber();
+  // }
 }
