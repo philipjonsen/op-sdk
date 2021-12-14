@@ -65,9 +65,7 @@ export class Bond {
     );
   }
 
-  async getBondInfo(
-    getBondInfoOption: GetBondInfoOption,
-  ): Promise<string> {
+  async getBondInfo(getBondInfoOption: GetBondInfoOption): Promise<string> {
     // const epochState = await queryMarketEpochState({
     //   lcd: this._lcd,
     //   market: getBondInfoOption.market,
@@ -107,30 +105,30 @@ export class Bond {
     return payoutFor.toNumber();
   }
 
-    // TODO (appleseed): what's the return value (number on evm pro)
-    // 1. is current_time a req'd parameter?
-    async getCurrentDebt(): Promise<number> {
-      const currentDebt = await queryCurrentDebt({
-        lcd: this._lcd,
-      })(this._addressProvider);
-      return currentDebt.toNumber();
-    }
+  // TODO (appleseed): what's the return value (number on evm pro)
+  // 1. is current_time a req'd parameter?
+  async getCurrentDebt(): Promise<number> {
+    const currentDebt = await queryCurrentDebt({
+      lcd: this._lcd,
+    })(this._addressProvider);
+    return currentDebt.toNumber();
+  }
 
-    // TODO (appleseed): what's the return value (number on evm pro)
-    async getDebtRatio(): Promise<number> {
-      const debtRatio = await queryDebtRatio({
-        lcd: this._lcd,
-      })(this._addressProvider);
-      return debtRatio.toNumber();
-    }
+  // TODO (appleseed): what's the return value (number on evm pro)
+  async getDebtRatio(): Promise<number> {
+    const debtRatio = await queryDebtRatio({
+      lcd: this._lcd,
+    })(this._addressProvider);
+    return debtRatio.toNumber();
+  }
 
-    // TODO (appleseed): what's the return value (number on evm pro)
-    async getTrueBondPrice(): Promise<number> {
-      const trueBondPrice = await queryTrueBondPrice({
-        lcd: this._lcd,
-      })(this._addressProvider);
-      return trueBondPrice.toNumber();
-    }
+  // TODO (appleseed): what's the return value (number on evm pro)
+  async getTrueBondPrice(): Promise<number> {
+    const trueBondPrice = await queryTrueBondPrice({
+      lcd: this._lcd,
+    })(this._addressProvider);
+    return trueBondPrice.toNumber();
+  }
 
   // async getAPY(getAPYOption: GetApyOption): Promise<number> {
   //   const epochState = await queryOverseerEpochState({

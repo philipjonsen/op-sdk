@@ -9,14 +9,8 @@ import { Bond } from './bond/bond';
 export class Olympus {
   // sub-facades
   bond!: Bond;
-  borrow!: Borrow;
-  bluna!: BLuna;
-  anchorToken!: AnchorToken;
 
   constructor(lcd: LCDClient, addressProvider: AddressProvider) {
     this.bond = new Bond(lcd, addressProvider);
-    this.borrow = new Borrow(lcd, addressProvider);
-    this.bluna = new BLuna(lcd, addressProvider);
-    this.anchorToken = new AnchorToken(lcd, addressProvider);
   }
 }
