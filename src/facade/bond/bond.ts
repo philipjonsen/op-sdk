@@ -1,4 +1,4 @@
-import { Int, Dec, LCDClient } from '@terra-money/terra.js';
+import { LCDClient } from '@terra-money/terra.js';
 import { AddressProvider, MARKET_DENOMS } from '../../address-provider';
 import {
   fabricateDepositAsset,
@@ -8,13 +8,14 @@ import {
 } from '../../fabricators';
 import {
   // queryMarketEpochState,
-  queryMaxPayout,
   queryBondInfo,
-  queryTokenBalance,
-  queryPayoutFor,
+  queryBondPrice,
+  queryConfig,
   queryCurrentDebt,
-  queryDebtRatio,
-  queryTrueBondPrice,
+  queryCurrentOlympusFee,
+  queryPayoutFor,
+  queryState,
+  StateResponse,
 } from '../../queries';
 import { Operation, OperationImpl } from '../operation';
 import { BLOCKS_PER_YEAR } from '../../constants';
@@ -27,13 +28,17 @@ export type BondWithdrawStableOption = OmitAddress<
   OptionType<typeof fabricateRedeemBond>
 >;
 
-export interface GetBondInfoOption {
-  address: string;
+export interface QueryOption {
+  contractAddress: string;
+}
+
+export interface GetBondInfoOption extends QueryOption {
+  user: string;
 }
 
 // TODO (appleseed): should this be number? BigNumber on evm pro
-export interface GetPayoutForOption {
-  tokenAmount: string;
+export interface GetPayoutForOption extends QueryOption {
+  value: string;
 }
 
 export interface GetApyOption {
@@ -65,7 +70,10 @@ export class Bond {
     );
   }
 
-  async getBondInfo(getBondInfoOption: GetBondInfoOption): Promise<string> {
+  async getBondInfo({
+    user,
+    contractAddress: contract_address,
+  }: GetBondInfoOption): Promise<unknown> {
     // const epochState = await queryMarketEpochState({
     //   lcd: this._lcd,
     //   market: getBondInfoOption.market,
@@ -83,51 +91,70 @@ export class Bond {
     //   .toString();
     return await queryBondInfo({
       lcd: this._lcd,
-      address: getBondInfoOption.address,
+      contract_address,
+      user,
     })(this._addressProvider);
   }
 
-  // TODO (appleseed): what's the return value (number on evm pro)
-  async getMaxPayout(): Promise<number> {
-    const maxPayout = await queryMaxPayout({
+  async getBondPrice({ contractAddress }: QueryOption): Promise<unknown> {
+    const bondPrice = await queryBondPrice({
       lcd: this._lcd,
+      contract_address: contractAddress,
     })(this._addressProvider);
-    return maxPayout.toNumber();
+    return bondPrice;
+  }
+
+  // TODO (appleseed): what's the return value (number on evm pro)
+  async getConfig({ contractAddress }: QueryOption): Promise<unknown> {
+    const config = await queryConfig({
+      lcd: this._lcd,
+      contract_address: contractAddress,
+    })(this._addressProvider);
+    return config;
   }
 
   // TODO (appleseed): what's the return value (number on evm pro)
   // 1. is payout_total_supply a req'd parameter?
-  async getPayoutFor(getPayoutForOption: GetPayoutForOption): Promise<number> {
+  async getPayoutFor({
+    contractAddress,
+    value,
+  }: GetPayoutForOption): Promise<unknown> {
     const payoutFor = await queryPayoutFor({
       lcd: this._lcd,
-      token_amount: getPayoutForOption.tokenAmount,
+      contract_address: contractAddress,
+      value,
     })(this._addressProvider);
-    return payoutFor.toNumber();
+    return payoutFor;
   }
 
   // TODO (appleseed): what's the return value (number on evm pro)
   // 1. is current_time a req'd parameter?
-  async getCurrentDebt(): Promise<number> {
+  async getCurrentDebt({ contractAddress }: QueryOption): Promise<unknown> {
     const currentDebt = await queryCurrentDebt({
       lcd: this._lcd,
+      contract_address: contractAddress,
     })(this._addressProvider);
-    return currentDebt.toNumber();
+    return currentDebt;
   }
 
   // TODO (appleseed): what's the return value (number on evm pro)
-  async getDebtRatio(): Promise<number> {
-    const debtRatio = await queryDebtRatio({
+  async getCurrentOlympusFee({
+    contractAddress,
+  }: QueryOption): Promise<unknown> {
+    const debtRatio = await queryCurrentOlympusFee({
       lcd: this._lcd,
+      contract_address: contractAddress,
     })(this._addressProvider);
-    return debtRatio.toNumber();
+    return debtRatio;
   }
 
   // TODO (appleseed): what's the return value (number on evm pro)
-  async getTrueBondPrice(): Promise<number> {
-    const trueBondPrice = await queryTrueBondPrice({
+  async getState({ contractAddress }: QueryOption): Promise<StateResponse> {
+    const state = await queryState({
       lcd: this._lcd,
+      contract_address: contractAddress,
     })(this._addressProvider);
-    return trueBondPrice.toNumber();
+    return state;
   }
 
   // async getAPY(getAPYOption: GetApyOption): Promise<number> {

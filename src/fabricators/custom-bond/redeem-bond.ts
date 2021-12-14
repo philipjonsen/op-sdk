@@ -6,15 +6,14 @@ import { validateIsNumber } from '../../utils/validation/number';
 
 interface Option {
   address: string;
-  amount: string;
-  max_price: string;
+  contractAddress: string;
   depositor: string;
 }
 
-export const fabricateDeposit =
-  ({ address, olympus_treasury }: Option) =>
-  (addressProvider: AddressProvider): MsgExecuteContract[] => {
-    validateInput([validateAddress(address)]);
+export const fabricateRedeemBond =
+  ({ address, contractAddress, depositor }: Option) =>
+  (_: AddressProvider): MsgExecuteContract[] => {
+    validateInput([validateAddress(address), validateAddress(contractAddress)]);
 
-    return [new MsgExecuteContract(address, '', {})];
+    return [new MsgExecuteContract(address, contractAddress, { depositor })];
   };

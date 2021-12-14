@@ -30,7 +30,7 @@ export const queryConfig =
     const response: ConfigResponse = await lcd.wasm.contractQuery(
       contract_address,
       {
-        //... query props here
+        config: {},
       },
     );
     return response;

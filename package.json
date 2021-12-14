@@ -1,11 +1,8 @@
 {
-  "name": "@anchor-protocol/anchor.js",
-  "version": "2.0.0",
-  "author": "Anchor Protocol",
+  "name": "@olympus/terra-sdk",
+  "version": "0.1.0",
+  "author": "Olympus DAO",
   "license": "MIT",
-  "repository": "github:Anchor-Protocol/anchor.js",
-  "bugs": "https://github.com/Anchor-Protocol/anchor.js/issues",
-  "homepage": "https://github.com/Anchor-Protocol/anchor.js",
   "engines": {
     "node": ">=12"
   },

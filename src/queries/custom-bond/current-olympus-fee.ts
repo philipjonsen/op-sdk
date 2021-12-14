@@ -16,7 +16,7 @@ export const queryCurrentOlympusFee =
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (_: AddressProvider): Promise<Response> => {
     const response: Response = await lcd.wasm.contractQuery(contract_address, {
-      //... query props here
+      olympus_fee: {},
     });
     return response;
   };

@@ -4,7 +4,6 @@ import { AddressProvider } from '../..';
 interface Option {
   lcd: LCDClient;
   contract_address: string;
-  value: string;
 }
 
 interface Terms {
@@ -24,10 +23,10 @@ interface Adjustment {
 }
 
 //(TODO) (aphex) needs to be filled
-interface StateResponse {
+export interface StateResponse {
   total_debt: number;
   terms: Terms;
-  last_decat: number;
+  last_decay: number;
   adjustment: Adjustment;
   payout_since_last_subsidy: number;
   total_principal_bonded: number;
@@ -35,14 +34,13 @@ interface StateResponse {
 }
 
 export const queryState =
-  ({ lcd, contract_address, value }: Option) =>
+  ({ lcd, contract_address }: Option) =>
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (_: AddressProvider): Promise<StateResponse> => {
     const response: StateResponse = await lcd.wasm.contractQuery(
       contract_address,
       {
-        //TODO: (aphex) check if this is correct
-        value,
+        state: {},
       },
     );
     return response;

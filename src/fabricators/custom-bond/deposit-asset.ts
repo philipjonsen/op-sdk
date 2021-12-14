@@ -6,13 +6,25 @@ import { validateIsNumber } from '../../utils/validation/number';
 
 interface Option {
   address: string;
+  amount: string;
+  max_price: string;
   depositor: string;
 }
 
-export const fabricateRedeem =
-  ({ address, olympus_treasury }: Option) =>
+export const fabricateDepositAsset =
+  ({ address, max_price, depositor }: Option) =>
   (addressProvider: AddressProvider): MsgExecuteContract[] => {
     validateInput([validateAddress(address)]);
 
-    return [new MsgExecuteContract(address, '', {})];
+    const contractAddress = ''; // TODO: (aphex) figure out how to get contract for differnt bonds dinamically
+
+    return [
+      new MsgExecuteContract(address, contractAddress, {
+        deposit: {
+          max_price,
+          depositor,
+        },
+      }),
+      //TODO: (aphex): needs to receive native funds??
+    ];
   };
