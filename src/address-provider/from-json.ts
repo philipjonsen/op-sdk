@@ -6,10 +6,10 @@ export interface AddressMap {
 
 export type AllowedAddressKeys = keyof AddressMap;
 
-export class AddressProviderFromJson implements AddressProvider {
-  constructor(private data: AddressMap) {}
-
-  customBond(): string {
-    return this.data.customBond;
-  }
-}
+// export class AddressProviderFromJson implements AddressProvider {
+//   constructor(private data: AddressMap) {}
+//
+//   customBond(): string {
+//     return this.data.customBond;
+//   }
+// }

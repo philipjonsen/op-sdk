@@ -13,7 +13,8 @@ interface Option {
 
 export const fabricateDepositAsset =
   ({ address, max_price, depositor }: Option) =>
-  (addressProvider: AddressProvider): MsgExecuteContract[] => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  (_addressProvider: AddressProvider): MsgExecuteContract[] => {
     validateInput([validateAddress(address)]);
 
     const contractAddress = ''; // TODO: (aphex) figure out how to get contract for differnt bonds dinamically

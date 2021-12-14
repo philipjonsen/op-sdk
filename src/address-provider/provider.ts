@@ -1,7 +1,5 @@
 export interface AddressProvider {
-  whiteWhaleToken(): string;
-  loopToken(): string;
-  nexusToken(): string;
+  ustToken(): string;
 }
 
 export enum MARKET_DENOMS {

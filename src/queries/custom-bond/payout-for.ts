@@ -18,7 +18,7 @@ export const queryPayoutFor =
   async (_: AddressProvider): Promise<Response> => {
     const response: Response = await lcd.wasm.contractQuery(contract_address, {
       //TODO: (aphex) check if this is correct
-      payoutFor: {},
+      payoutFor: { value },
     });
     return response;
   };

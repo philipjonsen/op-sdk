@@ -1,6 +1,13 @@
 {
   "include": ["src/**/*"],
-  "exclude": ["/node_modules/", "./src/**/*.spec.ts", "src/**/*.no-commit.*"],
+  "exclude": [
+    "/node_modules/",
+    "./src/**/*.spec.ts",
+    "src/**/*.no-commit.*",
+    "src/examples/",
+    "src/__tests__",
+    "src/**/*.test.*"
+  ],
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
