@@ -7,10 +7,14 @@ import {
   OptionType,
 } from '../../fabricators';
 import {
-  queryMarketEpochState,
+  // queryMarketEpochState,
   queryMaxPayout,
   queryBondInfo,
   queryTokenBalance,
+  queryPayoutFor,
+  queryCurrentDebt,
+  queryDebtRatio,
+  queryTrueBondPrice,
 } from '../../queries';
 import { Operation, OperationImpl } from '../operation';
 import { BLOCKS_PER_YEAR } from '../../constants';
@@ -94,6 +98,7 @@ export class Bond {
   }
 
   // TODO (appleseed): what's the return value (number on evm pro)
+  // 1. is payout_total_supply a req'd parameter?
   async getPayoutFor(getPayoutForOption: GetPayoutForOption): Promise<number> {
     const payoutFor = await queryPayoutFor({
       lcd: this._lcd,
@@ -103,6 +108,7 @@ export class Bond {
   }
 
     // TODO (appleseed): what's the return value (number on evm pro)
+    // 1. is current_time a req'd parameter?
     async getCurrentDebt(): Promise<number> {
       const currentDebt = await queryCurrentDebt({
         lcd: this._lcd,
