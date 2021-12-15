@@ -31,11 +31,10 @@
   "publishConfig": {
     "access": "public"
   },
-  "dependencies": {},
   "devDependencies": {
     "@ssen/eslint-config": "^2.0.1",
     "@ssen/prettier-config": "^2.0.1",
-    "@terra-money/terra.js": "^3.0.0",
+    "@terra-money/terra.js": "^3.0.1",
     "@types/jest": "^27.0.2",
     "@types/node": "^16.10.3",
     "@typescript-eslint/eslint-plugin": "^4.33.0",

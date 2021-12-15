@@ -3,7 +3,7 @@ import { AddressProvider } from '../address-provider';
 import { Bond } from './bond/bond';
 
 // the frontier
-export class Olympus {
+export class OlympusTerra {
   // sub-facades
   bond!: Bond;
 
