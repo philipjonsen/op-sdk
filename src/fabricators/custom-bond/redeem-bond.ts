@@ -2,7 +2,6 @@ import { MsgExecuteContract } from '@terra-money/terra.js';
 import { AddressProvider } from '../../address-provider/provider';
 import { validateInput } from '../../utils/validate-input';
 import { validateAddress } from '../../utils/validation/address';
-import { validateIsNumber } from '../../utils/validation/number';
 
 interface Option {
   address: string;
@@ -15,5 +14,11 @@ export const fabricateRedeemBond =
   (_: AddressProvider): MsgExecuteContract[] => {
     validateInput([validateAddress(address), validateAddress(contractAddress)]);
 
-    return [new MsgExecuteContract(address, contractAddress, { depositor })];
+    return [
+      new MsgExecuteContract(address, contractAddress, {
+        redeem_bond: {
+          depositor,
+        },
+      }),
+    ];
   };

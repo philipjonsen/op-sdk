@@ -7,7 +7,6 @@ import {
   OptionType,
 } from '../../fabricators';
 import {
-  // queryMarketEpochState,
   queryBondInfo,
   queryBondPrice,
   queryConfig,
@@ -18,7 +17,6 @@ import {
   StateResponse,
 } from '../../queries';
 import { Operation, OperationImpl } from '../operation';
-import { BLOCKS_PER_YEAR } from '../../constants';
 
 // TODO (appleseed): fix for olympus
 export type BondDepositAsset = OmitAddress<
@@ -54,18 +52,18 @@ export class Bond {
     this._addressProvider = addressProvider;
   }
 
-  depositAsset(depositAsset: BondDepositAsset): Operation {
+  depositAsset(depositAssetOptions: BondDepositAsset): Operation {
     return new OperationImpl(
       fabricateDepositAsset,
-      depositAsset,
+      depositAssetOptions,
       this._addressProvider,
     );
   }
 
-  redeemBond(redeemBondOption: BondWithdrawStableOption): Operation {
+  redeemBond(redeemBondOptions: BondWithdrawStableOption): Operation {
     return new OperationImpl(
       fabricateRedeemBond,
-      redeemBondOption,
+      redeemBondOptions,
       this._addressProvider,
     );
   }
@@ -74,21 +72,6 @@ export class Bond {
     user,
     contractAddress: contract_address,
   }: GetBondInfoOption): Promise<unknown> {
-    // const epochState = await queryMarketEpochState({
-    //   lcd: this._lcd,
-    //   market: getBondInfoOption.market,
-    // })(this._addressProvider);
-    // const userATerraBalance = await d({
-    //   lcd: this._lcd,
-    //   address: getBondInfoOption.address,
-    //   token_address: this._addressProvider.aTerra(getBondInfoOption.market),
-    // })(this._addressProvider);
-
-    // return new Int(
-    //   new Dec(epochState.exchange_rate).mul(userATerraBalance.balance),
-    // )
-    //   .div(1000000)
-    //   .toString();
     return await queryBondInfo({
       lcd: this._lcd,
       contract_address,
@@ -156,12 +139,4 @@ export class Bond {
     })(this._addressProvider);
     return state;
   }
-
-  // async getAPY(getAPYOption: GetApyOption): Promise<number> {
-  //   const epochState = await queryOverseerEpochState({
-  //     lcd: this._lcd,
-  //     ...getAPYOption,
-  //   })(this._addressProvider);
-  //   return new Dec(epochState.deposit_rate).mul(BLOCKS_PER_YEAR).toNumber();
-  // }
 }

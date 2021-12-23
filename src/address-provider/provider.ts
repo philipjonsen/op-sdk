@@ -1,5 +1,5 @@
 export interface AddressProvider {
-  ustToken(): string;
+  customBond(): string;
 }
 
 export enum MARKET_DENOMS {

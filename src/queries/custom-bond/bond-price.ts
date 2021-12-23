@@ -16,7 +16,7 @@ export const queryBondPrice =
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (_: AddressProvider): Promise<Response> => {
     const response: Response = await lcd.wasm.contractQuery(contract_address, {
-      bondPrice: {},
+      bond_price: {},
     });
     return response;
   };

@@ -21,7 +21,7 @@ export const queryBondInfo =
   async (_: AddressProvider): Promise<BondInfo> => {
     const response: BondInfo = await lcd.wasm.contractQuery(contract_address, {
       //TODO: (aphex) check if this is correct
-      user,
+      bond_info: { user },
     });
     return response;
   };
