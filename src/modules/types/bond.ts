@@ -1,17 +1,8 @@
-import { TerraBond } from '../modules/terra/facade';
-import { Chain } from '../constants';
-
-export interface SlippageToleranceConfig {
-  beliefPrice: string;
-  maxSpread: string;
-}
-
-export interface OpModule {
-  bond: TerraBond;
-}
+import { OpModule, Chain } from '../..';
 
 export interface DepositOptions {
-  a: unknown;
+  depositor: string;
+  max_price: string;
 }
 
 export interface ReedeemOptions {
@@ -23,8 +14,10 @@ export interface QueryOption {
 }
 
 export interface BondModule {
+  // writes
   depositAsset: (options: DepositOptions) => unknown;
-  redeemBond: (options: DepositOptions) => unknown;
+  redeemBond: (options: ReedeemOptions) => unknown;
+  // queries
   getBondInfo: (option: QueryOption) => unknown;
   getConfig: (option: QueryOption) => unknown;
   getPayoutFor: (option: QueryOption) => unknown;

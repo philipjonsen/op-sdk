@@ -16,7 +16,9 @@ import {
   queryState,
   StateResponse,
 } from '../../queries';
-import { Operation, OperationImpl } from '../operation';
+import { Operation, OperationImpl } from '../../../../facade/operation';
+
+import { BondModule } from '../../../types/bond';
 
 // TODO (appleseed): fix for olympus
 export type BondDepositAsset = OmitAddress<
@@ -43,7 +45,7 @@ export interface GetApyOption {
   market: MARKET_DENOMS;
 }
 
-export class Bond {
+export class TerraBond implements BondModule {
   private _lcd!: LCDClient;
   private _addressProvider!: AddressProvider;
 

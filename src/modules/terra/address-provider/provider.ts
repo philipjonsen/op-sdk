@@ -1,5 +1,9 @@
 export interface AddressProvider {
   customBond(): string;
+  customTreasury(): string;
+  factory(): string;
+  subsidyRouter(): string;
+  getAddressByContractName(name: string): string;
 }
 
 export enum MARKET_DENOMS {

@@ -1,7 +1,4 @@
-import { OlympusTerra } from '.';
-export * from './address-provider';
+import { OlympusPro } from './facade';
 export * from './constants';
-export * from './fabricators';
-export * from './queries';
 export * from './facade';
-export default OlympusTerra;
+export default OlympusPro;
