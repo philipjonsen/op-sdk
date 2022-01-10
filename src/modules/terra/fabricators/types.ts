@@ -1,5 +1,5 @@
 import { Msg } from '@terra-money/terra.js';
-import { AddressProvider } from '..';
+import { AddressProvider } from '../address-provider';
 
 export type Expire =
   | { at_height: number }

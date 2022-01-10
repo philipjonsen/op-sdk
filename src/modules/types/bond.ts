@@ -16,11 +16,14 @@ export interface QueryOption {
 export interface BondModule {
   // writes
   depositAsset: (options: DepositOptions) => unknown;
-  redeemBond: (options: ReedeemOptions) => unknown;
+  //TODO: implement option type
+  redeemBond: (options: never) => unknown;
   // queries
-  getBondInfo: (option: QueryOption) => unknown;
+  //TODO: implement option type
+  getBondInfo: (option: never) => unknown;
   getConfig: (option: QueryOption) => unknown;
-  getPayoutFor: (option: QueryOption) => unknown;
+  //TODO: implement option type
+  getPayoutFor: (option: never) => unknown;
   getCurrentOlympusFee: (option: QueryOption) => unknown;
   getState: (option: QueryOption) => unknown;
 }

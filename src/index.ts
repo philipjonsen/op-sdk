@@ -1,4 +1,4 @@
-import { OlympusPro } from './facade';
+import { SDKBuilder } from './facade';
 export * from './constants';
 export * from './facade';
-export default OlympusPro;
+export default SDKBuilder;

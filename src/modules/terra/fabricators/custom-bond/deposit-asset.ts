@@ -5,7 +5,6 @@ import { validateAddress } from '../../utils/validation/address';
 
 interface Option {
   address: string;
-  amount: string;
   max_price: string;
   depositor: string;
 }

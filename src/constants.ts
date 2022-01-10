@@ -10,7 +10,7 @@ export enum NetworkID {
   Solana_Testnet = 'replace-me',
 }
 
-export const networks: Networks = {
+export const supportedNetworkDetails: Networks = {
   [NetworkID.Terra_Mainnet]: {
     id: NetworkID.Terra_Mainnet,
     chain: Chain.TERRA,

@@ -1,5 +1,5 @@
 import { TerraBond } from '../modules/terra/facade';
-import { Chain } from '../constants';
+import { NetworkID, Chain } from '../constants';
 
 export interface SlippageToleranceConfig {
   beliefPrice: string;
@@ -35,3 +35,5 @@ export interface BondModule {
 export type Modules = {
   [key in Chain]?: OpModule;
 };
+
+export type SDK = (networkID: NetworkID) => OpModule;

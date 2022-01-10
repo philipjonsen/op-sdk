@@ -6,8 +6,8 @@ import {
   Fee,
   Wallet,
 } from '@terra-money/terra.js';
-import { Fabricator, OmitAddress } from '..';
-import { AddressProvider } from '../address-provider';
+import { Fabricator, OmitAddress } from '../modules/terra/fabricators';
+import { AddressProvider } from '../modules/terra/address-provider';
 
 export interface OperationGasParameters {
   fee?: Fee;

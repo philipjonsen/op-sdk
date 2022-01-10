@@ -1,15 +1,10 @@
-import { Chain, NetworkID, networks } from '..';
-import { OpModule } from './types';
+import { Chain, NetworkID, supportedNetworkDetails } from '..';
+import { Modules, OpModule, SDK } from './types';
 import { moduleCreators, ModuleConfig } from '../modules';
-
-export type Modules = {
-  [key in Chain]?: OpModule;
-};
-export type SDK = (networkID: NetworkID) => OpModule;
 
 export const createSDK = (modules: Modules): SDK => {
   return (networkID: NetworkID): OpModule => {
-    const chain = networks[networkID].chain;
+    const chain = supportedNetworkDetails[networkID].chain;
 
     if (!modules[chain]) {
       throw new Error('OlympusSDK called with an unsupported chain id');
