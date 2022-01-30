@@ -1,5 +1,5 @@
 {
-  "name": "@olympusdao/op-sdk",
+  "name": "@olympusdao/op.js",
   "version": "0.0.1",
   "license": "MIT",
   "engines": {
@@ -18,11 +18,9 @@
     "build": "tsc --module commonjs",
     "test": "jest",
     "doc": "typedoc",
-    "precommit": "auto-changelog",
     "format": "prettier --write ./src/**/**/*.ts",
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
     "prepublishOnly": "npm run build",
-    "integration-test": "ts-node ./integration-test/index.ts",
     "prepare": "husky install"
   },
   "lint-staged": {
