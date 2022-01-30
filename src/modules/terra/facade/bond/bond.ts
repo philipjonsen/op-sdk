@@ -18,7 +18,7 @@ import {
 } from 'modules/terra/queries';
 import { Operation, OperationImpl } from 'core/operation';
 
-import { BondModule } from 'modules/types/bond';
+import { BondModule, QueryOption } from 'modules/types/bond';
 
 // TODO (appleseed): fix for olympus
 export type BondDepositAsset = OmitAddress<
@@ -27,10 +27,6 @@ export type BondDepositAsset = OmitAddress<
 export type BondWithdrawStableOption = OmitAddress<
   OptionType<typeof fabricateRedeemBond>
 >;
-
-export interface QueryOption {
-  contractAddress: string;
-}
 
 export interface GetBondInfoOption extends QueryOption {
   user: string;

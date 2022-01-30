@@ -1,4 +1,4 @@
-import { OpModule } from '../..';
+import { OpModule } from 'core/types';
 
 //not implemented
 export class SolanaModule implements OpModule {

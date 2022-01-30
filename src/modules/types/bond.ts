@@ -1,4 +1,5 @@
-import { OpModule, Chain } from '../..';
+import { OpModule } from 'core/types';
+import { Chain } from 'src/constants';
 
 export interface DepositOptions {
   depositor: string;

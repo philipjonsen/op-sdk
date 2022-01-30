@@ -1,5 +1,6 @@
-import { TerraBond } from '../modules/terra/facade';
-import { NetworkID, Chain } from '../constants';
+import { TerraBond } from 'modules/terra/facade';
+import { NetworkID, Chain } from 'src/constants';
+import { QueryOption } from 'modules/types/bond';
 
 export interface SlippageToleranceConfig {
   beliefPrice: string;
@@ -16,10 +17,6 @@ export interface DepositOptions {
 
 export interface ReedeemOptions {
   a: unknown;
-}
-
-export interface QueryOption {
-  contractAddress: string;
 }
 
 export interface BondModule {
