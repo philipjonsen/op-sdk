@@ -1,4 +1,4 @@
-import { SDKBuilder } from 'core';
+import { SDKBuilder } from './core';
 
 export default new SDKBuilder();
 export { SDKBuilder };

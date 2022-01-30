@@ -39,12 +39,12 @@ $ npm install -S @terra-money/terra.js @olympusdao/op.js
     yarn link @olympusdao/op.js
 
     # DONE
+    # You can start this project in dev mode with
+    yarn dev
 ```
 
 ```sh
-    # To see updates to op.js on your project run
-    yarn build
-    # on this project
+    yarn dev
 ```
 
 ### Setup
