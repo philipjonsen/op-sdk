@@ -1,6 +1,7 @@
 # OlympusPro.js
 
 op.js is a multi-chain client SDK for building applications that can interact with Olympus Pro Protocol from within JavaScript runtimes, such as web browsers, server backends, and on mobile through React Native.
+
 Kindly forked from [Anchor.js](https://anchor-protocol.github.io/anchor.js/).
 
 ## Getting
@@ -18,12 +19,40 @@ To your JavaScript project's `package.json` as dependencies using your preferred
 $ npm install -S @terra-money/terra.js @olympusdao/op.js
 ```
 
+### Setup for Local Development
+
+```sh
+    # NAVIGATE TO YOUR PROJECT DIR
+    cd <YOUR PROJECT>
+    cd node_modules/@terra-money/terra.js
+    yarn link
+
+    # NAVIGATE TO THIS PROJECT
+    cd <THIS PROJECT>
+    yarn install
+    yarn link @terra-money/terra.js
+    yarn build
+    yarn link
+
+    # BACK TO YOUR PROJECT DIR AGAIN
+    cd <YOUR PROJECT>
+    yarn link @olympusdao/op.js
+
+    # DONE
+```
+
+```sh
+    # To see updates to op.js on your project run
+    yarn build
+    # on this project
+```
+
 ### Setup
 
 Initializing the SDK:
 
 ```ts
-import SDKBuilder, { Chain } from '@olympusdao/op-sdk';
+import SDKBuilder, { Chain } from '@olympusdao/op.js';
 
 //assemble configuration object for a specific method, ie:
 const terraConfig = { lcdClient, addressProvider };
@@ -35,9 +64,6 @@ sdk(NetworkID.Mainnet).bond.redeemBond(...args);
 
 ### Using Facades
 
-Olympus-Terra.js provides class wrapper facade for the usual operations available on
-[webapp](https://pro.olympusdao.finance).
-
 ```ts
 import { LCDClient, MnemonicKey, Fee, Wallet } from '@terra-money/terra.js';
 import {
@@ -46,7 +72,7 @@ import {
   AddressProviderFromJson,
   MARKET_DENOMS,
   OperationGasParameters,
-} from '@olympus-dao/Olympus-Terra.js';
+} from '@olympusdao/op.js';
 
 const addressProvider = new AddressProviderFromJson(columbus5);
 const lcd = new LCDClient({
@@ -86,34 +112,32 @@ const txResult = await olympus.bond
 
 ### Using Message Fabricators
 
-Olympus-Terra.js provides facilities for 2 main use cases:
+op.js provides facilities for 2 main use cases:
 
 - query: runs smart contract queries through LCD
 - execute: creates proper `MsgExecuteContract` objects to be used in transactions
 
-Both of these functions are accessible through the [`Message Fabricators`](https://github.com/Anchor-Protocol/anchor.js/tree/master/src/fabricators).
+  Both of these functions are accessible through the [`Message Fabricators`](https://github.com/Anchor-Protocol/anchor.js/tree/master/src/fabricators).
 
-To Use the message fabricators:
+  To Use the message fabricators:
 
-**Note**: Please note that `market` is a different variable from the coin denom. The denomination for the coins in the example is set to be `uusd`.
+  **Note**: Please note that `market` is a different variable from the coin denom. The denomination for the coins in the example is set to be `uusd`.
 
-```ts
-import {fabricateRedeemBond, fabricateDepositAsset} from '@anchor-protocol/anchor.js';
-import {AddressProviderFromJson} from "@anchor-protocol/anchor.js";
+  ```ts
 
-// default -- uses bombay core contract addresses
-const addressMap = somehowGetAddresses();
-const addressProvider = new AddressProviderFromJson(addressMap);
-    const redeemMsg = fabricateRedeemBond({
-      depositor: 'terra123...',
-    })(addressProvider);
+  // default -- uses bombay core contract addresses
+  const addressMap = somehowGetAddresses();
+  const addressProvider = new AddressProviderFromJson(addressMap);
+  const redeemMsg = fabricateRedeemBond({
+  depositor: 'terra123...',
+  })(addressProvider);
 
-    const depositMsg = fabricateDepositAsset({
-      amount: 10,
-      max_price: 500
-      address: 'terra123...',
-    })(addressProvider);
-```
+  const depositMsg = fabricateDepositAsset({
+  amount: 10,
+  max_price: 500
+  address: 'terra123...',
+  })(addressProvider);
+  ```
 
 ## Executing
 
