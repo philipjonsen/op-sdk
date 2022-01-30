@@ -1,4 +1,4 @@
-import { AddressProvider } from '../address-provider';
+import { AddressProvider } from 'modules/terra/address-provider';
 
 export type QueryOptionType<T> = T extends Querier<infer Option, unknown>
   ? Option

@@ -1,4 +1,7 @@
-import { SDKBuilder } from './facade';
+import { SDKBuilder } from 'core';
+
+export default new SDKBuilder();
+export { SDKBuilder };
+export * from 'core';
 export * from './constants';
-export * from './facade';
-export default SDKBuilder;
+export * from './modules';

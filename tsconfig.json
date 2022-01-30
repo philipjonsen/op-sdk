@@ -30,6 +30,12 @@
     "strictFunctionTypes": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
-    "target": "es2015"
+    "target": "es2015",
+    "baseUrl": "./src",
+    "paths": {
+      "src/*": ["./*"],
+      "core/*": ["core/*"],
+      "modules/*": ["modules/*"]
+    }
   }
 }

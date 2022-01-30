@@ -1,6 +1,6 @@
-import { TerraBond } from './facade';
-import { OpModule } from '../..';
 import { LCDClient } from '@terra-money/terra.js';
+import { OpModule } from 'core/types';
+import { TerraBond } from './facade';
 import { AddressProvider } from './address-provider';
 
 export interface TerraModuleConfig {

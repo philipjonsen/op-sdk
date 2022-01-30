@@ -4,7 +4,7 @@
   "excludeExternals": true,
   "exclude": ["**/*+(index|.spec|.e2e).ts", "**/__tests__/*"],
   "theme": "default",
-  "name": "anchor.js",
+  "name": "op-sdk.js",
   "excludePrivate": true,
   "excludeProtected": true,
   "hideGenerator": true

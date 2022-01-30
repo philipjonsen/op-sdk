@@ -20,14 +20,30 @@ Add both:
 To your JavaScript project's `package.json` as dependencies using your preferred package manager:
 
 ```sh
-$ npm install -S @terra-money/terra.js @anchor-protocol/anchor.js
+$ npm install -S @terra-money/terra.js @olympusdao/op-sdk
 ```
 
 ## Usage
 
+### Setup
+
+Initializing the SDK:
+
+```ts
+import SDKBuilder, { Chain } from '@olympusdao/op-sdk';
+
+//assemble configuration object for a specific method, ie:
+const terraConfig = { lcdClient, addressProvider };
+
+const sdk = new SDKBuilder().addModule(Chain.TERRA, terraConfig).build();
+
+sdk(NetworkID.Mainnet).bond.redeemBond(...args);
+```
+
 ### Using Facades
 
-Olympus-Terra.js provides class wrapper facade for the usual operations available on [webapp](https://app.anchorprotocol.com).
+Olympus-Terra.js provides class wrapper facade for the usual operations available on
+[webapp](https://pro.olympusdao.finance).
 
 ```ts
 import { LCDClient, MnemonicKey, Fee, Wallet } from '@terra-money/terra.js';

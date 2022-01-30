@@ -1,5 +1,6 @@
-import { Chain } from '..';
-import { OpModule } from '..';
+import { Chain } from 'src/constants';
+import { OpModule } from 'core/types';
+
 import { TerraModule, TerraModuleConfig } from './terra';
 
 type ModuleCreator = (config: ModuleConfig) => OpModule;

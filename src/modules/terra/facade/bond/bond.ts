@@ -1,11 +1,11 @@
 import { LCDClient } from '@terra-money/terra.js';
-import { AddressProvider, MARKET_DENOMS } from '../../address-provider';
+import { AddressProvider, MARKET_DENOMS } from 'modules/terra/address-provider';
 import {
   fabricateDepositAsset,
   fabricateRedeemBond,
   OmitAddress,
   OptionType,
-} from '../../fabricators';
+} from 'modules/terra/fabricators';
 import {
   queryBondInfo,
   queryBondPrice,
@@ -15,10 +15,10 @@ import {
   queryPayoutFor,
   queryState,
   StateResponse,
-} from '../../queries';
-import { Operation, OperationImpl } from '../../../../facade/operation';
+} from 'modules/terra/queries';
+import { Operation, OperationImpl } from 'core/operation';
 
-import { BondModule } from '../../../types/bond';
+import { BondModule } from 'modules/types/bond';
 
 // TODO (appleseed): fix for olympus
 export type BondDepositAsset = OmitAddress<
