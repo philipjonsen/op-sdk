@@ -49,7 +49,7 @@
     "ts-jest": "^27.0.5",
     "ts-node": "^10.2.1",
     "typedoc": "^0.22.5",
-    "typescript": "^4.5.5"
+    "typescript": "4.4.3"
   },
   "peerDependencies": {
     "@terra-money/terra.js": "^3.0.1"
