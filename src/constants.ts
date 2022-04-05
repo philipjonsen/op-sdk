@@ -6,7 +6,7 @@ export enum Chain {
 export enum NetworkID {
   Terra_Mainnet = 'columbus-5',
   Terra_Testnet = 'bombay-12',
-  Solana_Mainnet = 'replace-me',
+  Solana_Mainnet = 5459788,
   Solana_Testnet = 'replace-me',
 }
 

@@ -1,6 +1,14 @@
 import { OpModule } from 'core/types';
+import { SolanaBond } from './facade';
 
-//not implemented
+export interface SolanaModuleConfig {
+  connection?: unknown;
+}
+
 export class SolanaModule implements OpModule {
-  bond!: never;
+  bond!: SolanaBond;
+
+  constructor(config: SolanaModuleConfig) {
+    this.bond = new SolanaBond(config);
+  }
 }

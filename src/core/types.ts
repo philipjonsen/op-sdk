@@ -1,4 +1,5 @@
 import { TerraBond } from 'modules/terra/facade';
+import { SolanaBond } from 'modules/solana/facade';
 import { NetworkID, Chain } from 'src/constants';
 import { QueryOption } from 'modules/types/bond';
 
@@ -8,7 +9,7 @@ export interface SlippageToleranceConfig {
 }
 
 export interface OpModule {
-  bond: TerraBond;
+  bond: TerraBond | SolanaBond;
 }
 
 export interface DepositOptions {
