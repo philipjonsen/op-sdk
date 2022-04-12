@@ -5,3 +5,4 @@ public
 coverage
 storybook-static
 **/*.no-commit.*
+sandbox

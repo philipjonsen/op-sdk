@@ -6,7 +6,8 @@
     "src/**/*.no-commit.*",
     "src/examples/",
     "src/__tests__",
-    "src/**/*.test.*"
+    "src/**/*.test.*",
+    "demo/**/*"
   ],
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
