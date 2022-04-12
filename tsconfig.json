@@ -7,7 +7,7 @@
     "src/examples/",
     "src/__tests__",
     "src/**/*.test.*",
-    "demo/**/*"
+    "sandbox/**/*"
   ],
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
