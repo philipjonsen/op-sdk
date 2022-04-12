@@ -1,6 +1,17 @@
 /* eslint-disable */
-import { BondModule, QueryOption } from 'modules/types/bond';
+import { NetworkID } from 'src/constants';
+import { BondModule, QueryOption } from 'src/core/types';
+import { SolanaModuleConfig } from '../..';
+import { SolanaOperation } from '../../operations';
+import { DataProvider } from 'src/core';
+import {
+  PurchaseBondOptions,
+  GetBondPayoutOptions,
+  Options,
+  GetUserBondBalancesOptions,
+} from 'src/core';
 
+import { Wallet } from '@project-serum/anchor';
 export interface GetBondInfoOption extends QueryOption {
   user: string;
 }
@@ -10,53 +21,43 @@ export interface GetPayoutForOption extends QueryOption {
 }
 
 export class SolanaBond implements BondModule {
-  constructor(config: unknown) {
+  wallet: Wallet;
+  networkId: NetworkID;
+  dataProvider: DataProvider;
+
+  constructor(config: SolanaModuleConfig) {
+    this.wallet = config.wallet;
+    this.networkId = config.networkId;
+    this.dataProvider = config.dataProvider;
+
     console.log('SolanaBond Config', config);
   }
 
-  depositAsset(depositAssetOptions: any) {
-    console.log({ depositAssetOptions });
-    return null;
+  purchaseBond({ bond, value }: PurchaseBondOptions) {
+    return Promise.resolve();
   }
 
-  redeemBond(redeemBondOptions: any) {
-    console.log({ redeemBondOptions });
-    return null;
+  redeemBond({ bond }: Options) {
+    return Promise.resolve();
   }
 
-  getBondInfo({ user, contractAddress }: GetBondInfoOption) {
-    console.log({ user, contractAddress });
-    return null;
+  redeemAllBonds() {
+    return Promise.resolve();
   }
 
-  getBondPrice({ contractAddress }: QueryOption) {
-    console.log({ contractAddress });
-    return null;
+  getBondPayout({ bond, value }: GetBondPayoutOptions) {
+    return Promise.resolve();
   }
 
-  getConfig({ contractAddress }: QueryOption) {
-    console.log({ contractAddress });
-    return null;
+  getUserBondBalances({ filterByNetwork = false }: GetUserBondBalancesOptions) {
+    return Promise.resolve();
   }
 
-  getPayoutFor({ contractAddress, value }: GetPayoutForOption) {
-    console.log({ value });
-    console.log({ contractAddress });
-    return null;
+  getUserBondInfo({ bond }: Options) {
+    return Promise.resolve();
   }
 
-  getCurrentDebt({ contractAddress }: QueryOption) {
-    console.log({ contractAddress });
-    return null;
-  }
-
-  getCurrentOlympusFee({ contractAddress }: QueryOption) {
-    console.log({ contractAddress });
-    return null;
-  }
-
-  getState({ contractAddress }: QueryOption) {
-    console.log({ contractAddress });
-    return null;
+  getBondCalculations({ bond }: Options) {
+    return Promise.resolve();
   }
 }

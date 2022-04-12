@@ -1,6 +1,6 @@
 import { Chain, NetworkID, supportedNetworkDetails } from 'src/constants';
 import { moduleCreators, ModuleConfig } from 'modules';
-import { Modules, OpModule, SDK } from 'core/types';
+import { Modules, OpModule } from 'core/types';
 
 export class SDKBuilder {
   modules?: Modules;
@@ -15,23 +15,31 @@ export class SDKBuilder {
     return this;
   }
 
-  build(): SDK {
+  build(): OpSDK {
     if (!this.modules) {
-      throw new Error("Can't initialize SDK without at least one module");
+      throw new Error(
+        "OlympusSDK: Can't initialize SDK without at least one module",
+      );
     }
 
-    return createSDK(this.modules);
+    return new OpSDK(this.modules);
   }
 }
 
-export const createSDK = (modules: Modules): SDK => {
-  return function (networkID: NetworkID): OpModule {
+export class OpSDK {
+  modules: Modules;
+
+  constructor(modules: Modules) {
+    this.modules = modules;
+  }
+
+  of(networkID: NetworkID): OpModule {
     const chain = supportedNetworkDetails[networkID]?.chain;
 
-    if (!modules[chain]) {
-      throw new Error('OlympusSDK called with an unsupported chain id');
+    if (!this.modules[chain]) {
+      throw new Error('OlympusSDK: called with an unsupported chain id');
     }
 
-    return modules[chain] as OpModule;
-  };
-};
+    return this.modules[chain] as OpModule;
+  }
+}

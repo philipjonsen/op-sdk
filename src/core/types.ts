@@ -1,7 +1,10 @@
 import { TerraBond } from 'modules/terra/facade';
 import { SolanaBond } from 'modules/solana/facade';
 import { NetworkID, Chain } from 'src/constants';
-import { QueryOption } from 'modules/types/bond';
+
+export interface QueryOption {
+  contractAddress: string;
+}
 
 export interface SlippageToleranceConfig {
   beliefPrice: string;
@@ -20,14 +23,47 @@ export interface ReedeemOptions {
   a: unknown;
 }
 
+export interface DataProvider {
+  bonds: { [key: string]: string };
+  tokenAddresses: { [key: string]: string };
+  tokenPrices: { [key: string]: string };
+}
+
+export interface Bond {
+  name: string;
+}
+
+export interface Options {
+  bond: Bond;
+  address?: string;
+}
+
+export interface PurchaseBondOptions extends Options {
+  value: number;
+}
+
+export interface ReedeemAllBondsOptions extends Omit<Options, 'bond'> {
+  bonds: Array<Bond>;
+}
+
+export interface GetBondPayoutOptions extends Omit<Options, 'address'> {
+  value: number;
+}
+
+export interface GetUserBondBalancesOptions extends Omit<Options, 'bond'> {
+  filterByNetwork: boolean;
+}
+
 export interface BondModule {
-  depositAsset: (options: DepositOptions) => unknown;
-  redeemBond: (options: DepositOptions) => unknown;
-  getBondInfo: (option: QueryOption) => unknown;
-  getConfig: (option: QueryOption) => unknown;
-  getPayoutFor: (option: QueryOption) => unknown;
-  getCurrentOlympusFee: (option: QueryOption) => unknown;
-  getState: (option: QueryOption) => unknown;
+  purchaseBond: (options: PurchaseBondOptions) => Promise<unknown>;
+  redeemBond: (options: Options) => Promise<unknown>;
+  // Get payout details for a single bond
+  getBondPayout: (option: GetBondPayoutOptions) => Promise<unknown>;
+  // Get total user bond balance
+  getUserBondBalances: (option: GetUserBondBalancesOptions) => Promise<unknown>;
+  // Get a single user bond balance and details
+  getUserBondInfo: (option: Options) => Promise<unknown>;
+  getBondCalculations: (option: Options) => Promise<unknown>;
 }
 
 export type Modules = {
@@ -35,3 +71,7 @@ export type Modules = {
 };
 
 export type SDK = (networkID: NetworkID) => OpModule;
+
+export interface BaseOperation<T, R> {
+  execute: (args: T) => R;
+}

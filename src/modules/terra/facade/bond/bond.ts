@@ -16,9 +16,9 @@ import {
   queryState,
   StateResponse,
 } from 'modules/terra/queries';
-import { Operation, OperationImpl } from 'core/operation';
+import { Operation, OperationImpl } from 'modules/terra/operations';
 
-import { BondModule, QueryOption } from 'modules/types/bond';
+import { BondModule, QueryOption, Options } from 'core/types';
 
 // TODO (appleseed): fix for olympus
 export type BondDepositAsset = OmitAddress<
@@ -58,10 +58,10 @@ export class TerraBond implements BondModule {
     );
   }
 
-  redeemBond(redeemBondOptions: BondWithdrawStableOption): Operation {
+  redeemBond(options: Options): Operation {
     return new OperationImpl(
       fabricateRedeemBond,
-      redeemBondOptions,
+      options,
       this._addressProvider,
     );
   }
