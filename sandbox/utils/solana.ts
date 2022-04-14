@@ -1,16 +1,16 @@
 import { Program, web3 } from '@project-serum/anchor';
 
 export const addresses = {
-  tokenAMint: 'GiSZhnhuUK8JY9wTsCbx6G7B71GXw4x1trou8NSjcECe',
-  tokenBMint: 'J8tCXMyWeFCcW8H6hF6RVGHhX9Y5PAPFsrJnxbAXLJ3d',
-  partnerTokenA: '5D6vRB87xfWRmKBgLtFZAxJpZYTqHvNRCCP2WWq5DPp6',
-  partnerTokenB: '4cPawGGTYW8m7YRibJsSHkg7MXut8kR7yYg9tFVgjSBs',
-  olympusTokenA: '2rX8FPtYzpTo8h9tAhzejNHdDRdTPKJjvvbVg6MRYkFa',
-  olympusTokenB: 'FydrZd42QUFgX764DvMDvAh4ZxtXuZ4LhqtQrm6jer26',
-  userTokenA: 'AH5X6UCJw3qq6pjQ5macDo1EZLJTkVqFnqNKYTn3oCKG',
-  userTokenB: 'DgGXnnMhQqAD8QfesMFewuerXtvM9kV1JkBK5dGBURzL',
-  treasury: 'BoP2izadvgR9uVjm9pj13LHWMEUjpX7RhncrWv86BBy',
-  bonder: '6rKz5eMkNR2P1rrKv3jRSKJorHRMFWE8Cfn2EUNVVjqb',
+  tokenAMint: '3tUcARoV8dprVydwzQG82Uy57j5C1aqnfFx8q4ruABhW',
+  tokenBMint: 'EUxox5R2bACVWs4Kh1T55aPyy5eyHwCsU9GHhxZTEUBx',
+  partnerTokenA: 'CYNcMTUD4UojuFANHwwwwWyVwnM1J9V8MpXKtoixcXY4',
+  partnerTokenB: 'FYdupDTA5Y8ABgiBT7sywcYmHiseBJveyvpEgeC4ufEX',
+  olympusTokenA: '3GaSmgJo23HjdjE5AuuMmTarvbMY6LJpkb5fwvPBaM7u',
+  olympusTokenB: 'X8pbUyT5QNNx2ZAYMBuzKksRK1UL6VJQMcux1eHBQxa',
+  userTokenA: '8PoFWKmVrJ8zETBzkgcG9fdDBmShzEjXeEjkh36YmKbc',
+  userTokenB: '7fKcDLvZVADyE1XRT5n8qu85tq6toVdp3C43fPKvamTs',
+  treasury: '7zzUdm9P5FNDY7W8XZ8tHZVpmST8NpKEXyDQQosQoD29',
+  bonder: 'CcUNZLZPTGu1WVGSQpg7YzM6dfBMF1oUQde16rMQMfop',
 };
 
 class SolanaUtils {
@@ -20,7 +20,7 @@ class SolanaUtils {
     this.program = program;
   }
 
-  getPayoutAccount = async () => {
+  getPayoutAccount = async () =>
     await web3.PublicKey.findProgramAddress(
       [
         Buffer.from('account'),
@@ -29,7 +29,16 @@ class SolanaUtils {
       ],
       this.program.programId,
     );
-  };
+
+  getTreasury = async (publicKey: any) =>
+    await web3.PublicKey.findProgramAddress(
+      [
+        Buffer.from('treasury'),
+        new web3.PublicKey(addresses.tokenAMint).toBuffer(),
+        publicKey.toBuffer(),
+      ],
+      this.program.programId,
+    );
 
   getDaoPayoutAccount = async () =>
     await web3.PublicKey.findProgramAddress(
