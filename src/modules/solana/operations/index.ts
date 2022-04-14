@@ -61,10 +61,11 @@ export class SolanaOperation {
 
   async execute() {
     const program = this.getProgram();
+    const fabric = this.fabricator();
     try {
-      await program.rpc[this.fabricator.methodName]({
-        ...this.options,
-      });
+        const tx = await program.rpc[fabric.methodName](...fabric.options);
+
+
     } catch (err) {
       console.log(err);
     }

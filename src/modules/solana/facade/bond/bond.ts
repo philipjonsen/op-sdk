@@ -11,7 +11,11 @@ import {
   GetUserBondBalancesOptions,
 } from 'src/core';
 
-import { Wallet } from '@project-serum/anchor';
+import { Idl, Wallet } from '@project-serum/anchor';
+import fabricatePurchaseBond from '../../fabricators/bond/purchase-bond';
+import fabricateRedeemBond from '../../fabricators/bond/redeem-bond';
+import { Cluster } from '@solana/web3.js';
+
 export interface GetBondInfoOption extends QueryOption {
   user: string;
 }
@@ -22,27 +26,42 @@ export interface GetPayoutForOption extends QueryOption {
 
 export class SolanaBond implements BondModule {
   wallet: Wallet;
-  networkId: NetworkID;
+  networkId: Cluster;
   dataProvider: DataProvider;
+  idl: Idl;
 
   constructor(config: SolanaModuleConfig) {
     this.wallet = config.wallet;
     this.networkId = config.networkId;
     this.dataProvider = config.dataProvider;
+    this.idl = config.idl;
 
     console.log('SolanaBond Config', config);
   }
 
   purchaseBond({ bond, value }: PurchaseBondOptions) {
-    return Promise.resolve();
+    const fabricator = fabricatePurchaseBond({
+      //takes method/contract specifics
+    });
+    return new SolanaOperation(
+      this.networkId,
+      this.wallet,
+      this.idl,
+      fabricator,
+    ).execute();
   }
 
   redeemBond({ bond }: Options) {
-    return Promise.resolve();
-  }
+    const fabricator = fabricateRedeemBond({
+      //method/contract args
+    });
 
-  redeemAllBonds() {
-    return Promise.resolve();
+    return new SolanaOperation(
+      this.networkId,
+      this.wallet,
+      this.idl,
+      fabricator,
+    ).execute();
   }
 
   getBondPayout({ bond, value }: GetBondPayoutOptions) {
