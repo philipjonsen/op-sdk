@@ -1,6 +1,11 @@
 import { Program, web3 } from '@project-serum/anchor';
 
-export const addresses = {
+export const SYSTEM_PROGRAM_ID = web3.SystemProgram.programId;
+export const SYSVAR_RENT_PUBKEY = web3.SYSVAR_RENT_PUBKEY;
+export const SYSTEM_CLOCK_PUBKEY = web3.SYSVAR_CLOCK_PUBKEY;
+
+const address: any = {
+  programId: '61ZYzDJWf1KXdU6aEm6JEyE1z5Vjp3KHRSiKw9GAZaXp',
   tokenAMint: '3tUcARoV8dprVydwzQG82Uy57j5C1aqnfFx8q4ruABhW',
   tokenBMint: 'EUxox5R2bACVWs4Kh1T55aPyy5eyHwCsU9GHhxZTEUBx',
   partnerTokenA: 'CYNcMTUD4UojuFANHwwwwWyVwnM1J9V8MpXKtoixcXY4',
@@ -13,6 +18,9 @@ export const addresses = {
   bonder: 'CcUNZLZPTGu1WVGSQpg7YzM6dfBMF1oUQde16rMQMfop',
 };
 
+export const getPublicKey = (name: string): web3.PublicKey =>
+  new web3.PublicKey(address[name]);
+
 class SolanaUtils {
   program: Program;
 
@@ -24,8 +32,8 @@ class SolanaUtils {
     await web3.PublicKey.findProgramAddress(
       [
         Buffer.from('account'),
-        new web3.PublicKey(addresses.treasury).toBuffer(),
-        new web3.PublicKey(addresses.tokenAMint).toBuffer(),
+        getPublicKey('treasury').toBuffer(),
+        getPublicKey('tokenAMint').toBuffer(),
       ],
       this.program.programId,
     );
@@ -34,7 +42,7 @@ class SolanaUtils {
     await web3.PublicKey.findProgramAddress(
       [
         Buffer.from('treasury'),
-        new web3.PublicKey(addresses.tokenAMint).toBuffer(),
+        getPublicKey('tokenAMint').toBuffer(),
         publicKey.toBuffer(),
       ],
       this.program.programId,
@@ -42,19 +50,13 @@ class SolanaUtils {
 
   getDaoPayoutAccount = async () =>
     await web3.PublicKey.findProgramAddress(
-      [
-        Buffer.from('daoAccount'),
-        new web3.PublicKey(addresses.tokenAMint).toBuffer(),
-      ],
+      [Buffer.from('daoAccount'), getPublicKey('tokenAMint').toBuffer()],
       this.program.programId,
     );
 
   getDaoPrincipalAccount = async () =>
     await web3.PublicKey.findProgramAddress(
-      [
-        Buffer.from('daoAccount'),
-        new web3.PublicKey(addresses.tokenBMint).toBuffer(),
-      ],
+      [Buffer.from('daoAccount'), getPublicKey('tokenBMint').toBuffer()],
       this.program.programId,
     );
 
@@ -62,8 +64,18 @@ class SolanaUtils {
     await web3.PublicKey.findProgramAddress(
       [
         Buffer.from('account'),
-        new web3.PublicKey(addresses.treasury).toBuffer(),
-        new web3.PublicKey(addresses.tokenBMint).toBuffer(),
+        getPublicKey('treasury').toBuffer(),
+        getPublicKey('tokenBMint').toBuffer(),
+      ],
+      this.program.programId,
+    );
+
+  getBonder = async () =>
+    await web3.PublicKey.findProgramAddress(
+      [
+        Buffer.from('bonder'),
+        getPublicKey('treasury').toBuffer(),
+        getPublicKey('tokenBMint').toBuffer(),
       ],
       this.program.programId,
     );
@@ -76,10 +88,7 @@ class SolanaUtils {
 
   getTokenAuthority = async () =>
     await web3.PublicKey.findProgramAddress(
-      [
-        Buffer.from('olympusAuthority'),
-        new web3.PublicKey(addresses.treasury).toBuffer(),
-      ],
+      [Buffer.from('olympusAuthority'), getPublicKey('treasury').toBuffer()],
       this.program.programId,
     );
 }
