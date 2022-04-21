@@ -19,10 +19,19 @@ const Index: NextPage = () => {
   const [allUserBonds, setAllUserBonds] = useState([]);
 
   useEffect(() => {
-    const { wallet, program, getBonder } = utils;
+    const { wallet, program } = utils;
     if (wallet.connected) {
       (async () => {
-        const [bonder] = await getBonder();
+        const [treasury] = await utils.getTreasury(wallet.publicKey);
+        const [bonder] = await web3.PublicKey.findProgramAddress(
+          [
+            Buffer.from('bonder'),
+            treasury.toBuffer(),
+            getPublicKey('tokenBMint').toBuffer(),
+          ],
+          program.programId,
+        );
+        console.log('bonder', bonder.toString());
         const allBonds = await program.account.bond.all();
         setAllUserBonds(
           allBonds.filter(
