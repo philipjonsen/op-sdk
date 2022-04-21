@@ -44,12 +44,11 @@ const Index: NextPage = () => {
   }, [utils.wallet]);
 
   const getAccountInfo = async (mintAddress: string) => {
-    const mint = new web3.PublicKey(mintAddress);
-    const { value } = await utils.connection.getTokenAccountsByOwner(
+    const account = await utils.connection.getTokenAccountsByOwner(
       utils.wallet.publicKey,
-      { mint },
+      { mint: new web3.PublicKey(mintAddress) },
     );
-    return value[0].pubkey;
+    return account.value[0].pubkey;
   };
 
   const bonderDeposit = async () => {
@@ -63,7 +62,7 @@ const Index: NextPage = () => {
       const nftToken = web3.Keypair.generate();
 
       const [bonder] = await utils.getBonder();
-      const [bondAccount] = await utils.getBondAccount(bond);
+      const [bondAccount] = await utils.getBondAccount(bond.publicKey);
       const [payoutAccount] = await utils.getPayoutAccount();
       const [tokenAuthority] = await utils.getTokenAuthority();
       const [daoPayoutAccount] = await utils.getDaoPayoutAccount();

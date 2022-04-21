@@ -82,7 +82,7 @@ class SolanaUtils {
 
   getBondAccount = async (bond: any) =>
     await web3.PublicKey.findProgramAddress(
-      [Buffer.from('bond'), bond.publicKey.toBuffer()],
+      [Buffer.from('bond'), bond.toBuffer()],
       this.program.programId,
     );
 
