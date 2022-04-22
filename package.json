@@ -34,6 +34,7 @@
     "@ssen/eslint-config": "^2.0.1",
     "@ssen/prettier-config": "^2.0.1",
     "@terra-money/terra.js": "^3.0.1",
+    "@types/bn.js": "^5.1.0",
     "@types/jest": "^27.0.2",
     "@types/node": "^16.10.3",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
@@ -56,6 +57,8 @@
   },
   "dependencies": {
     "@project-serum/anchor": "^0.23.0",
-    "@solana/web3.js": "^1.37.1"
+    "@solana/spl-token": "^0.2.0",
+    "@solana/web3.js": "^1.37.1",
+    "encoding": "^0.1.13"
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { TerraBond } from 'modules/terra/facade';
 import { SolanaBond } from 'modules/solana/facade';
 import { NetworkID, Chain } from 'src/constants';
@@ -39,7 +40,13 @@ export interface Options {
 }
 
 export interface PurchaseBondOptions extends Options {
-  value: number;
+  amount: number;
+  maxPrice: number;
+}
+
+export interface RedeemBondOptions extends Options {
+  bond: any;
+  nftMint: string;
 }
 
 export interface ReedeemAllBondsOptions extends Omit<Options, 'bond'> {
@@ -55,15 +62,17 @@ export interface GetUserBondBalancesOptions extends Omit<Options, 'bond'> {
 }
 
 export interface BondModule {
-  purchaseBond: (options: PurchaseBondOptions) => Promise<unknown>;
-  redeemBond: (options: Options) => Promise<unknown>;
+  purchaseBond: (options: PurchaseBondOptions | any) => Promise<unknown> | any;
+  redeemBond: (options: RedeemBondOptions | any) => Promise<unknown> | any;
   // Get payout details for a single bond
-  getBondPayout: (option: GetBondPayoutOptions) => Promise<unknown>;
+  getBondPayout?: (option: GetBondPayoutOptions) => Promise<unknown>;
   // Get total user bond balance
-  getUserBondBalances: (option: GetUserBondBalancesOptions) => Promise<unknown>;
+  getUserBondBalances?: (
+    option: GetUserBondBalancesOptions,
+  ) => Promise<unknown>;
   // Get a single user bond balance and details
-  getUserBondInfo: (option: Options) => Promise<unknown>;
-  getBondCalculations: (option: Options) => Promise<unknown>;
+  getUserBondInfo: (option?: Options | any) => Promise<unknown> | any;
+  getBondCalculations?: (option: Options) => Promise<unknown>;
 }
 
 export type Modules = {

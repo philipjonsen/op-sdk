@@ -15,7 +15,7 @@ export const fabricatePurchaseBond = (
 ): PurchaseBondReturn => {
   let arg1, arg2;
   let accounts;
-
+  console.log({ args });
   return {
     methodName: 'bonderDeposit',
     options: [arg1, arg2, accounts],

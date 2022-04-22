@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { LCDClient } from '@terra-money/terra.js';
 import { AddressProvider, MARKET_DENOMS } from 'modules/terra/address-provider';
 import {
@@ -50,7 +51,7 @@ export class TerraBond implements BondModule {
     this._addressProvider = addressProvider;
   }
 
-  depositAsset(depositAssetOptions: BondDepositAsset): Operation {
+  purchaseBond(depositAssetOptions: BondDepositAsset | any): Operation {
     return new OperationImpl(
       fabricateDepositAsset,
       depositAssetOptions,
@@ -58,7 +59,7 @@ export class TerraBond implements BondModule {
     );
   }
 
-  redeemBond(options: Options): Operation {
+  redeemBond(options: Options | any): Operation | any {
     return new OperationImpl(
       fabricateRedeemBond,
       options,
@@ -83,6 +84,12 @@ export class TerraBond implements BondModule {
       contract_address: contractAddress,
     })(this._addressProvider);
     return bondPrice;
+  }
+
+  async getUserBondInfo(options: any): Promise<unknown> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    console.log({ options });
+    return Promise.resolve();
   }
 
   // TODO (appleseed): what's the return value (number on evm pro)

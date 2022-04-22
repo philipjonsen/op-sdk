@@ -1,12 +1,14 @@
-import { Wallet } from '@project-serum/anchor';
-import { DataProvider, OpModule } from 'core/types';
-import { NetworkID } from 'src/constants';
-import { SolanaBond } from './facade';
+import { Connection } from '@solana/web3.js';
+import { Idl, Program, Wallet } from '@project-serum/anchor';
 
+import { SolanaBond } from './facade';
+import { DataProvider, OpModule } from 'core/types';
 export interface SolanaModuleConfig {
+  idl: Idl;
   wallet: Wallet;
+  program: Program;
+  connection: Connection;
   dataProvider: DataProvider;
-  networkId: NetworkID;
 }
 
 export class SolanaModule implements OpModule {

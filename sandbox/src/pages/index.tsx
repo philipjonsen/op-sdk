@@ -1,217 +1,355 @@
 import type { NextPage } from 'next';
-import { BN, web3 } from '@project-serum/anchor';
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import { useEffect, useState } from 'react';
+import { BN } from '@project-serum/anchor';
+import { Fragment, useEffect, useState } from 'react';
 import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
+import format from 'date-fns/format';
+import fromUnixTime from 'date-fns/fromUnixTime';
+
 import {
   WalletMultiButton,
   WalletDisconnectButton,
 } from '@solana/wallet-adapter-react-ui';
 
-import { getPublicKey } from '../utils/solana';
 import useSolanaUtils from '../hooks/useSolanaUtils';
 
-const getISOString = (timestamp: number) =>
-  new Date(timestamp * 1000).toISOString();
+const getFormattedDate = (timestamp: number) =>
+  format(fromUnixTime(timestamp), 'yyyy-MM-dd HH:mm:ss');
+
+const shorten = (str: string, len: number = 10) => {
+  if (str.length < 10) return str;
+  return `${str.slice(0, len)}...${str.slice(str.length - len)}`;
+};
 
 const Index: NextPage = () => {
-  const utils = useSolanaUtils();
+  const { sdk, wallet } = useSolanaUtils();
+  const [amount, setAmount] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(0);
   const [allUserBonds, setAllUserBonds] = useState([]);
 
   useEffect(() => {
-    const { wallet, program } = utils;
     if (wallet.connected) {
-      (async () => {
-        const [treasury] = await utils.getTreasury(wallet.publicKey);
-        const [bonder] = await web3.PublicKey.findProgramAddress(
-          [
-            Buffer.from('bonder'),
-            treasury.toBuffer(),
-            getPublicKey('tokenBMint').toBuffer(),
-          ],
-          program.programId,
-        );
-        console.log('bonder', bonder.toString());
-        const allBonds = await program.account.bond.all();
-        setAllUserBonds(
-          allBonds.filter(
-            ({ account }: any) =>
-              account.bonder.toString() === bonder.toString(),
-          ),
-        );
-      })();
+      getUserBondInfo();
     }
-  }, [utils.wallet]);
+    if (!wallet.publicKey) {
+      setAllUserBonds([]);
+    }
+  }, [wallet]);
 
-  const getAccountInfo = async (mintAddress: string) => {
-    const account = await utils.connection.getTokenAccountsByOwner(
-      utils.wallet.publicKey,
-      { mint: new web3.PublicKey(mintAddress) },
-    );
-    return account.value[0].pubkey;
-  };
+  const getUserBondInfo = async () =>
+    setAllUserBonds(await sdk.bond.getUserBondInfo());
 
   const bonderDeposit = async () => {
-    const { connection, wallet, program } = utils;
-
     if (!wallet || !wallet.signTransaction) throw new WalletNotConnectedError();
-
-    try {
-      const bond = web3.Keypair.generate();
-      const nftMint = web3.Keypair.generate();
-      const nftToken = web3.Keypair.generate();
-
-      const [bonder] = await utils.getBonder();
-      const [bondAccount] = await utils.getBondAccount(bond.publicKey);
-      const [payoutAccount] = await utils.getPayoutAccount();
-      const [tokenAuthority] = await utils.getTokenAuthority();
-      const [daoPayoutAccount] = await utils.getDaoPayoutAccount();
-      const [principalAccount] = await utils.getPrincipalAccount();
-      const [daoPrincipalAccount] = await utils.getDaoPrincipalAccount();
-
-      const transaction = await program.transaction.bonderDeposit(
-        new BN(7.33),
-        new BN(10),
-        {
-          accounts: {
-            bonder,
-            bondAccount,
-            payoutAccount,
-            tokenAuthority,
-            principalAccount,
-            daoPayoutAccount,
-            daoPrincipalAccount,
-            bond: bond.publicKey,
-            payer: wallet.publicKey,
-            authority: wallet.publicKey,
-            tokenAccount: getPublicKey('userTokenB'),
-            payoutMint: getPublicKey('tokenAMint'),
-            principalMint: getPublicKey('tokenBMint'),
-            treasury: getPublicKey('treasury'),
-            nftMint: nftMint.publicKey,
-            nftToken: nftToken.publicKey,
-            systemProgram: web3.SystemProgram.programId,
-            tokenProgram: TOKEN_PROGRAM_ID,
-            clock: web3.SYSVAR_CLOCK_PUBKEY,
-            rent: web3.SYSVAR_RENT_PUBKEY,
-          },
-        },
-      );
-
-      transaction.feePayer = wallet.publicKey;
-      transaction.recentBlockhash = (
-        await connection.getRecentBlockhash()
-      ).blockhash;
-      transaction.sign(bond, nftMint, nftToken);
-      const signedTx = await wallet.signTransaction(transaction);
-      const txId = await connection.sendRawTransaction(signedTx.serialize());
-      await connection.confirmTransaction(txId);
-
-      console.log({ txId });
-      console.log('bond', bond.publicKey.toString());
-      console.log('nftMint', nftMint.publicKey.toString());
-      console.log('nftToken', nftToken.publicKey.toString());
-    } catch (error: any) {
-      console.log(`Error: ${error?.message}`);
+    if (amount === 0 || maxPrice === 0) {
+      throw new Error('Amount and maxPrice cannot be set as 0');
     }
+    await sdk.bond.purchaseBond({ amount, maxPrice });
+    getUserBondInfo();
   };
 
-  const redeemBond = async (bond: any, nftMint: any) => {
-    const { connection, wallet, program } = utils;
-
+  const redeemBond = async (bond: string, nftMint: string) => {
     if (!wallet || !wallet.signTransaction) throw new WalletNotConnectedError();
-
-    try {
-      const nftToken = await getAccountInfo(nftMint);
-      const [bonder] = await utils.getBonder();
-      const [bondAccount] = await utils.getBondAccount(bond);
-      const [tokenAuthority] = await utils.getTokenAuthority();
-
-      const transaction = await program.transaction.bondRedeem({
-        accounts: {
-          bond,
-          bonder,
-          nftToken,
-          bondAccount,
-          tokenAuthority,
-          payer: wallet.publicKey,
-          authority: wallet.publicKey,
-          treasury: getPublicKey('treasury'),
-          tokenAccount: getPublicKey('userTokenA'),
-          systemProgram: web3.SystemProgram.programId,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          clock: web3.SYSVAR_CLOCK_PUBKEY,
-          rent: web3.SYSVAR_RENT_PUBKEY,
-        },
-      });
-
-      transaction.feePayer = wallet.publicKey;
-      transaction.recentBlockhash = (
-        await connection.getRecentBlockhash()
-      ).blockhash;
-      const signedTx = await wallet.signTransaction(transaction);
-      const txId = await connection.sendRawTransaction(signedTx.serialize());
-      await connection.confirmTransaction(txId);
-      console.log('txId2', txId);
-    } catch (error: any) {
-      console.log(`Error: ${error?.message}`);
-    }
+    await sdk.bond.redeemBond({ bond, nftMint });
+    getUserBondInfo();
   };
 
   return (
     <>
-      <WalletMultiButton />
-      <WalletDisconnectButton />
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <h2>Solana SDK Sandbox</h2>
+        <div>
+          <WalletMultiButton className="connect" />
+        </div>
+      </div>
 
-      <button onClick={() => bonderDeposit()}>Bonder Deposit</button>
-
-      <h5>{allUserBonds.length} Bonds</h5>
-      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-        {allUserBonds.length &&
-          allUserBonds.map((bond: any, i) => (
+      <main style={{ margin: '20px 0' }}>
+        <div
+          style={{
+            fontSize: '14px',
+            fontWeight: 400,
+            padding: '18px',
+            marginBottom: '20px',
+            borderRadius: '3px',
+            color: '#856404',
+            backgroundColor: '#fff3cd',
+            borderColor: '#ffeeba',
+          }}
+        >
+          This page is specific to the following bond address
+          <strong> 28e4LSSTfqKmsocNjTgGWahjWMo56tngLXb6HoUGTo4u</strong> only at
+          the moment and does not include every available bond.
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <div style={{ width: '25%', marginRight: '15px' }}>
             <div
-              key={i}
               style={{
-                width: '30%',
-                overflowX: 'auto',
-                height: 'auto',
-                backgroundColor: 'rgba(54, 56, 64, 0.4)',
-                color: 'white',
-                margin: '10px',
-                padding: '4px 20px 20px',
-                borderRadius: '4px',
+                width: '100%',
+                color: '#FAFAFB',
+                padding: '6px 20px 20px',
+                marginBottom: '20px',
+                borderRadius: '6px',
+                background:
+                  'linear-gradient(237.43deg, #2B313D -12.81%, #171A20 132.72%)',
               }}
             >
-              <h4>
-                Bonder: <br />
-                {bond.account.bonder.toString()}
-              </h4>
-              <h4>
-                Bond:
-                <br />
-                {bond.publicKey.toString()}
-              </h4>
-              <h4>
-                NFTMint: <br />
-                {bond.account.nftMint.toString()}
-              </h4>
-              <h4>
-                Vesting Start:
-                <br />
-                {getISOString(+new BN(bond.account.vestingStart, 16))}
-              </h4>
-              <h4>
-                Vesting Term: <br />
-                {new BN(bond.account.vestingTerm, 16).toString()}
-              </h4>
-              <button
-                onClick={() => redeemBond(bond.publicKey, bond.account.nftMint)}
+              <h5
+                style={{
+                  fontSize: '24px',
+                  textAlign: 'center',
+                  marginTop: '25px',
+                  marginBottom: '25px',
+                }}
               >
-                Redeem Bond
+                {shorten('28e4LSSTfqKmsocNjTgGWahjWMo56tngLXb6HoUGTo4u', 3)}{' '}
+                Bond
+              </h5>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <label
+                  style={{
+                    fontSize: '15px',
+                    fontFamily: 'Square',
+                    fontWeight: 500,
+                    marginBottom: '8px',
+                  }}
+                >
+                  Amount:
+                </label>
+                <input
+                  type="number"
+                  style={{
+                    color: '#FCFCFC',
+                    border: 'none',
+                    background: 'rgba(54, 56, 64, 0.4)',
+                    borderRadius: '3px',
+                    padding: '14px',
+                  }}
+                  value={amount}
+                  onInput={(e: any) => setAmount(+e.target.value)}
+                />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <label
+                  style={{
+                    fontSize: '15px',
+                    fontFamily: 'Square',
+                    fontWeight: 500,
+                    marginTop: '15px',
+                    marginBottom: '8px',
+                  }}
+                >
+                  Max Price:
+                </label>
+                <input
+                  type="number"
+                  style={{
+                    color: '#FCFCFC',
+                    border: 'none',
+                    background: 'rgba(54, 56, 64, 0.4)',
+                    borderRadius: '3px',
+                    padding: '14px',
+                  }}
+                  value={maxPrice}
+                  onInput={(e: any) => setMaxPrice(+e.target.value)}
+                />
+              </div>
+              <button
+                style={{
+                  marginTop: '20px',
+                  color: '#333333',
+                  height: '43px',
+                  border: 0,
+                  fontWeight: 500,
+                  fontSize: '16px',
+                  borderRadius: '3px',
+                  padding: '0 25px',
+                  width: '100%',
+                  backgroundColor: '#F8CC82',
+                  cursor: 'pointer',
+                }}
+                onClick={bonderDeposit}
+              >
+                Bond
               </button>
             </div>
-          ))}
-      </div>
+          </div>
+          <div style={{ width: '75%' }}>
+            <div
+              style={{
+                width: '100%',
+                color: '#FAFAFB',
+                padding: '6px 30px 20px',
+                borderRadius: '6px',
+                background:
+                  'linear-gradient(237.43deg, #2B313D -12.81%, #171A20 132.72%)',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  marginBottom: '15px',
+                }}
+              >
+                <h5
+                  style={{
+                    fontSize: '24px',
+                    marginTop: '25px',
+                    marginBottom: '20px',
+                    fontWeight: 600,
+                  }}
+                >
+                  Purchased Bonds{' '}
+                  <span style={{ fontSize: '12px', fontWeight: 400 }}>
+                    (
+                    {wallet.publicKey
+                      ? wallet.publicKey?.toString()
+                      : 'Wallet Not Connected'}
+                    )
+                  </span>
+                </h5>
+              </div>
+
+              {allUserBonds.length > 0 && wallet.publicKey ? (
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '30%',
+                      fontWeight: 700,
+                      fontSize: '16px',
+                    }}
+                  >
+                    Bond Address
+                  </div>
+                  <div
+                    style={{
+                      width: '30%',
+                      fontWeight: 700,
+                      fontSize: '16px',
+                    }}
+                  >
+                    NFT Mint Address
+                  </div>
+                  <div
+                    style={{
+                      width: '20%',
+                      fontWeight: 700,
+                      fontSize: '16px',
+                    }}
+                  >
+                    Vesting Start
+                  </div>
+                  <div
+                    style={{
+                      width: '10%',
+                      textAlign: 'center',
+                      fontWeight: 700,
+                      fontSize: '16px',
+                    }}
+                  >
+                    Term
+                  </div>
+                  <div style={{ width: '10%', marginLeft: '20px' }}>&nbsp;</div>
+                </div>
+              ) : null}
+
+              {allUserBonds.length > 0 && wallet.publicKey ? (
+                allUserBonds
+                  ?.sort(
+                    (a: any, b: any) =>
+                      a.account.vestingStart - b.account.vestingStart,
+                  )
+                  ?.map((bond: any, i) => (
+                    <Fragment key={i}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          color: '#FCFCFC',
+                          overflow: 'hidden',
+                          margin: '20px 0',
+                          fontWeight: 400,
+                          fontSize: '15px',
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: '30%',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {shorten(bond.publicKey.toString())}
+                        </div>
+                        <div
+                          style={{
+                            width: '30%',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {shorten(bond.account.nftMint.toString())}
+                        </div>
+                        <div
+                          style={{
+                            width: '20%',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {getFormattedDate(
+                            +new BN(bond.account.vestingStart, 16),
+                          )}
+                        </div>
+                        <div
+                          style={{
+                            width: '10%',
+                            textAlign: 'center',
+                          }}
+                        >
+                          {new BN(bond.account.vestingTerm, 16).toString()}
+                        </div>
+                        <div style={{ width: '10%', marginLeft: '20px' }}>
+                          <button
+                            style={{
+                              color: '#333333',
+                              height: '30px',
+                              border: 0,
+                              fontWeight: 500,
+                              fontSize: '15px',
+                              borderRadius: '3px',
+                              backgroundColor: '#F8CC82',
+                              width: '100%',
+                              cursor: 'pointer',
+                              textAlign: 'center',
+                            }}
+                            onClick={() =>
+                              redeemBond(bond.publicKey, bond.account.nftMint)
+                            }
+                          >
+                            Redeem
+                          </button>
+                        </div>
+                      </div>
+                    </Fragment>
+                  ))
+              ) : (
+                <div style={{ textAlign: 'center' }}>No Bonds Purchased</div>
+              )}
+            </div>
+          </div>
+        </div>
+      </main>
     </>
   );
 };

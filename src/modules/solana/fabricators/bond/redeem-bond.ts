@@ -15,7 +15,7 @@ export const fabricateRedeemBond = (
 ): RedeemBondReturn => {
   let arg1, arg2;
   let accounts;
-
+  console.log({ args });
   return {
     methodName: 'redeemBond',
     options: [arg1, arg2, accounts],

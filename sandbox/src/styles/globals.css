@@ -1,7 +1,7 @@
 html,
 body {
   padding: 0;
-  margin: 20px;
+  margin: 8px 15px;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   color: #fcfcfc;
@@ -44,4 +44,14 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+.wallet-adapter-button-start-icon {
+  display: none;
+}
+
+.wallet-adapter-button.connect {
+  margin-left: 10px;
+  color: #fafafb;
+  background: linear-gradient(237.43deg, #2b313d -12.81%, #171a20 132.72%);
 }
