@@ -215,6 +215,13 @@ export class SolanaBond implements BondModule {
     const [bondAccount] = await this.utils.getBondAccount(options.bond);
     const [tokenAuthority] = await this.utils.getTokenAuthority();
 
+    const tokenAccount = await this.createAndGetTokenAccount(
+      this.connection,
+      this.wallet,
+      this.wallet.publicKey,
+      getPublicKey('tokenAMint'),
+    );
+
     try {
       const transaction = this.program.transaction.bondRedeem({
         accounts: {
@@ -222,11 +229,11 @@ export class SolanaBond implements BondModule {
           bonder,
           nftToken,
           bondAccount,
+          tokenAccount,
           tokenAuthority,
           payer: this.wallet.publicKey,
           authority: this.wallet.publicKey,
           treasury: getPublicKey('treasury'),
-          tokenAccount: getPublicKey('userTokenA'),
           systemProgram: web3.SystemProgram.programId,
           tokenProgram: TOKEN_PROGRAM_ID,
           clock: web3.SYSVAR_CLOCK_PUBKEY,
