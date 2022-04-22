@@ -4,13 +4,11 @@ import { Fragment, useEffect, useState } from 'react';
 import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 import format from 'date-fns/format';
 import fromUnixTime from 'date-fns/fromUnixTime';
-
-import {
-  WalletMultiButton,
-  WalletDisconnectButton,
-} from '@solana/wallet-adapter-react-ui';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 import useSolanaUtils from '../hooks/useSolanaUtils';
+import { CopyIcon } from '../components/CopyIcon';
 
 const getFormattedDate = (timestamp: number) =>
   format(fromUnixTime(timestamp), 'yyyy-MM-dd HH:mm:ss');
@@ -87,95 +85,157 @@ const Index: NextPage = () => {
         </div>
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <div style={{ width: '25%', marginRight: '15px' }}>
-            <div
-              style={{
-                width: '100%',
-                color: '#FAFAFB',
-                padding: '6px 20px 20px',
-                marginBottom: '20px',
-                borderRadius: '6px',
-                background:
-                  'linear-gradient(237.43deg, #2B313D -12.81%, #171A20 132.72%)',
-              }}
-            >
-              <h5
+            <div>
+              <div
                 style={{
-                  fontSize: '24px',
-                  textAlign: 'center',
-                  marginTop: '25px',
-                  marginBottom: '25px',
-                }}
-              >
-                {shorten('28e4LSSTfqKmsocNjTgGWahjWMo56tngLXb6HoUGTo4u', 3)}{' '}
-                Bond
-              </h5>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <label
-                  style={{
-                    fontSize: '15px',
-                    fontFamily: 'Square',
-                    fontWeight: 500,
-                    marginBottom: '8px',
-                  }}
-                >
-                  Amount:
-                </label>
-                <input
-                  type="number"
-                  style={{
-                    color: '#FCFCFC',
-                    border: 'none',
-                    background: 'rgba(54, 56, 64, 0.4)',
-                    borderRadius: '3px',
-                    padding: '14px',
-                  }}
-                  value={amount}
-                  onInput={(e: any) => setAmount(+e.target.value)}
-                />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <label
-                  style={{
-                    fontSize: '15px',
-                    fontFamily: 'Square',
-                    fontWeight: 500,
-                    marginTop: '15px',
-                    marginBottom: '8px',
-                  }}
-                >
-                  Max Price:
-                </label>
-                <input
-                  type="number"
-                  style={{
-                    color: '#FCFCFC',
-                    border: 'none',
-                    background: 'rgba(54, 56, 64, 0.4)',
-                    borderRadius: '3px',
-                    padding: '14px',
-                  }}
-                  value={maxPrice}
-                  onInput={(e: any) => setMaxPrice(+e.target.value)}
-                />
-              </div>
-              <button
-                style={{
-                  marginTop: '20px',
-                  color: '#333333',
-                  height: '43px',
-                  border: 0,
-                  fontWeight: 500,
-                  fontSize: '16px',
-                  borderRadius: '3px',
-                  padding: '0 25px',
                   width: '100%',
-                  backgroundColor: '#F8CC82',
-                  cursor: 'pointer',
+                  color: '#FAFAFB',
+                  padding: '20px 20px 20px',
+                  marginBottom: '15px',
+                  borderRadius: '6px',
+                  background:
+                    'linear-gradient(237.43deg, #2B313D -12.81%, #171A20 132.72%)',
                 }}
-                onClick={bonderDeposit}
               >
-                Bond
-              </button>
+                <span style={{ fontSize: '12px', fontWeight: 400 }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      marginBottom: '6px',
+                    }}
+                  >
+                    <div style={{ width: '90px', marginRight: '10px' }}>
+                      Principal Token:
+                    </div>
+                    <div style={{ marginRight: '10px' }}>
+                      {shorten(
+                        '4gwMMjNvB3cRk845v9mUif5MqdfoyuAPAXYHjeYiTizG',
+                        8,
+                      )}
+                    </div>
+                    <CopyToClipboard
+                      text="4gwMMjNvB3cRk845v9mUif5MqdfoyuAPAXYHjeYiTizG"
+                      onCopy={() => console.log('copied')}
+                    >
+                      <div>
+                        <CopyIcon />
+                      </div>
+                    </CopyToClipboard>
+                  </div>
+                  <div style={{ display: 'flex' }}>
+                    <div style={{ width: '90px', marginRight: '10px' }}>
+                      Payout Token:
+                    </div>
+                    <div style={{ marginRight: '10px' }}>
+                      {shorten(
+                        '6Sm365Dr3pLaeXv5g9uuuY24fnNcRs7KbhLCd2sZ2uBo',
+                        8,
+                      )}
+                    </div>
+                    <CopyToClipboard
+                      text="6Sm365Dr3pLaeXv5g9uuuY24fnNcRs7KbhLCd2sZ2uBo"
+                      onCopy={() => console.log('copied')}
+                    >
+                      <div>
+                        <CopyIcon />
+                      </div>
+                    </CopyToClipboard>
+                  </div>
+                </span>
+              </div>
+            </div>
+            <div>
+              <div
+                style={{
+                  width: '100%',
+                  color: '#FAFAFB',
+                  padding: '6px 20px 20px',
+                  marginBottom: '20px',
+                  borderRadius: '6px',
+                  background:
+                    'linear-gradient(237.43deg, #2B313D -12.81%, #171A20 132.72%)',
+                }}
+              >
+                <h5
+                  style={{
+                    fontSize: '24px',
+                    textAlign: 'center',
+                    marginTop: '25px',
+                    marginBottom: '25px',
+                  }}
+                >
+                  {shorten('28e4LSSTfqKmsocNjTgGWahjWMo56tngLXb6HoUGTo4u', 3)}{' '}
+                  Bond
+                </h5>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <label
+                    style={{
+                      fontSize: '15px',
+                      fontFamily: 'Square',
+                      fontWeight: 500,
+                      marginBottom: '8px',
+                    }}
+                  >
+                    Amount:
+                  </label>
+                  <input
+                    type="number"
+                    style={{
+                      color: '#FCFCFC',
+                      border: 'none',
+                      background: 'rgba(54, 56, 64, 0.4)',
+                      borderRadius: '3px',
+                      padding: '14px',
+                    }}
+                    value={amount}
+                    onInput={(e: any) => setAmount(+e.target.value)}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <label
+                    style={{
+                      fontSize: '15px',
+                      fontFamily: 'Square',
+                      fontWeight: 500,
+                      marginTop: '15px',
+                      marginBottom: '8px',
+                    }}
+                  >
+                    Max Price:
+                  </label>
+                  <input
+                    type="number"
+                    style={{
+                      color: '#FCFCFC',
+                      border: 'none',
+                      background: 'rgba(54, 56, 64, 0.4)',
+                      borderRadius: '3px',
+                      padding: '14px',
+                    }}
+                    value={maxPrice}
+                    onInput={(e: any) => setMaxPrice(+e.target.value)}
+                  />
+                </div>
+                <button
+                  style={{
+                    marginTop: '20px',
+                    color: '#333333',
+                    height: '43px',
+                    border: 0,
+                    fontWeight: 500,
+                    fontSize: '16px',
+                    borderRadius: '3px',
+                    padding: '0 25px',
+                    width: '100%',
+                    backgroundColor: '#F8CC82',
+                    cursor: 'pointer',
+                  }}
+                  onClick={bonderDeposit}
+                >
+                  Bond
+                </button>
+              </div>
             </div>
           </div>
           <div style={{ width: '75%' }}>
@@ -344,7 +404,9 @@ const Index: NextPage = () => {
                     </Fragment>
                   ))
               ) : (
-                <div style={{ textAlign: 'center' }}>No Bonds Purchased</div>
+                <div style={{ textAlign: 'center', marginBottom: '15px' }}>
+                  No Bonds Found
+                </div>
               )}
             </div>
           </div>
