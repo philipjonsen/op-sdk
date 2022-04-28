@@ -42,11 +42,17 @@ export interface Options {
 export interface PurchaseBondOptions extends Options {
   amount: number;
   maxPrice: number;
+  treasury: string;
+  payoutToken: string;
+  principalToken: string;
 }
 
 export interface RedeemBondOptions extends Options {
   bond: any;
   nftMint: string;
+  treasury: string;
+  payoutToken: string;
+  principalToken: string;
 }
 
 export interface ReedeemAllBondsOptions extends Omit<Options, 'bond'> {

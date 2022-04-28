@@ -55,3 +55,39 @@ a {
   color: #fafafb;
   background: linear-gradient(237.43deg, #2b313d -12.81%, #171a20 132.72%);
 }
+
+.bond-card {
+  flex: calc(33.33% - 10px);
+  margin: 5px;
+  color: #fafafb;
+  padding: 20px 20px 20px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  background: linear-gradient(237.43deg, #2b313d -12.81%, #171a20 132.72%);
+}
+
+.bond {
+  top: 50%;
+  left: 50%;
+  width: 500px;
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.bond-title {
+  margin-bottom: 50px;
+  text-align: center;
+}
+
+.bond-content {
+  width: 75%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  margin: 0 auto;
+}
+
+.identicon {
+  border-radius: 50%;
+}

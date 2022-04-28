@@ -3,9 +3,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { Connection, Transaction } from '@solana/web3.js';
-import { BN, Idl, Program, Wallet, web3 } from '@project-serum/anchor';
+import {
+  BN,
+  Idl,
+  Program,
+  Provider,
+  Wallet,
+  web3,
+} from '@project-serum/anchor';
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
@@ -13,23 +19,17 @@ import {
   getAccount,
   createAssociatedTokenAccountInstruction,
 } from '@solana/spl-token';
+
 import {
   BondModule,
   PurchaseBondOptions,
   QueryOption,
   RedeemBondOptions,
 } from 'src/core/types';
+import idl from '../../idl/olympuspro_sol.json';
+import SolanaUtils from '../../utils';
+import { partners } from '../../partners';
 import { SolanaModuleConfig } from '../..';
-import { DataProvider } from 'src/core';
-import {
-  GetBondPayoutOptions,
-  Options,
-  GetUserBondBalancesOptions,
-} from 'src/core';
-import SolanaUtils, { getPublicKey } from '../../utils';
-
-// import fabricatePurchaseBond from '../../fabricators/bond/purchase-bond';
-// import fabricateRedeemBond from '../../fabricators/bond/redeem-bond';
 
 export interface GetBondInfoOption extends QueryOption {
   user: string;
@@ -39,20 +39,22 @@ export interface GetPayoutForOption extends QueryOption {
   value: string;
 }
 
+const PROGRAM_ID = '61ZYzDJWf1KXdU6aEm6JEyE1z5Vjp3KHRSiKw9GAZaXp';
+
 export class SolanaBond implements BondModule {
   idl: Idl;
   wallet: Wallet;
   program: Program;
+  provider: Provider;
   connection: Connection;
-  dataProvider: DataProvider;
   utils: any;
 
   constructor(config: SolanaModuleConfig) {
     this.idl = config.idl;
     this.wallet = config.wallet;
-    this.program = config.program;
     this.connection = config.connection;
-    this.dataProvider = config.dataProvider;
+    this.provider = new Provider(config.connection, config.wallet, {});
+    this.program = new Program(idl as any, PROGRAM_ID, this.provider);
     this.utils = new SolanaUtils(this.program);
   }
 
@@ -115,19 +117,32 @@ export class SolanaBond implements BondModule {
     const nftMint = web3.Keypair.generate();
     const nftToken = web3.Keypair.generate();
 
-    const [bonder] = await this.utils.getBonder(this.wallet.publicKey);
+    console.log('options', options);
+    const { treasury, payoutToken, principalToken } = options;
+
+    const [bonder] = await this.utils.getBonder(treasury, principalToken);
     const [bondAccount] = await this.utils.getBondAccount(bond.publicKey);
-    const [payoutAccount] = await this.utils.getPayoutAccount();
-    const [tokenAuthority] = await this.utils.getTokenAuthority();
-    const [daoPayoutAccount] = await this.utils.getDaoPayoutAccount();
-    const [principalAccount] = await this.utils.getPrincipalAccount();
-    const [daoPrincipalAccount] = await this.utils.getDaoPrincipalAccount();
+    const [payoutAccount] = await this.utils.getPayoutAccount(
+      treasury,
+      payoutToken,
+    );
+    const [tokenAuthority] = await this.utils.getTokenAuthority(treasury);
+    const [daoPayoutAccount] = await this.utils.getDaoPayoutAccount(
+      payoutToken,
+    );
+    const [principalAccount] = await this.utils.getPrincipalAccount(
+      treasury,
+      principalToken,
+    );
+    const [daoPrincipalAccount] = await this.utils.getDaoPrincipalAccount(
+      principalToken,
+    );
 
     const tokenAccount = await this.createAndGetTokenAccount(
       this.connection,
       this.wallet,
       this.wallet.publicKey,
-      getPublicKey('tokenBMint'),
+      new web3.PublicKey(principalToken),
     );
 
     console.log({
@@ -158,9 +173,9 @@ export class SolanaBond implements BondModule {
             bond: bond.publicKey,
             payer: this.wallet.publicKey,
             authority: this.wallet.publicKey,
-            payoutMint: getPublicKey('tokenAMint'),
-            principalMint: getPublicKey('tokenBMint'),
-            treasury: getPublicKey('treasury'),
+            payoutMint: new web3.PublicKey(payoutToken),
+            principalMint: new web3.PublicKey(principalToken),
+            treasury: new web3.PublicKey(treasury),
             nftMint: nftMint.publicKey,
             nftToken: nftToken.publicKey,
             systemProgram: web3.SystemProgram.programId,
@@ -205,21 +220,21 @@ export class SolanaBond implements BondModule {
   };
 
   public redeemBond = async (options: RedeemBondOptions): Promise<any> => {
-    console.log('props', options);
+    const { treasury, payoutToken, principalToken } = options;
     const account = await this.connection.getTokenAccountsByOwner(
       this.wallet.publicKey,
       { mint: new web3.PublicKey(options.nftMint) },
     );
     const nftToken = account.value[0].pubkey;
-    const [bonder] = await this.utils.getBonder(this.wallet.publicKey);
+    const [bonder] = await this.utils.getBonder(treasury, principalToken);
     const [bondAccount] = await this.utils.getBondAccount(options.bond);
-    const [tokenAuthority] = await this.utils.getTokenAuthority();
+    const [tokenAuthority] = await this.utils.getTokenAuthority(treasury);
 
     const tokenAccount = await this.createAndGetTokenAccount(
       this.connection,
       this.wallet,
       this.wallet.publicKey,
-      getPublicKey('tokenAMint'),
+      new web3.PublicKey(payoutToken),
     );
 
     try {
@@ -233,7 +248,7 @@ export class SolanaBond implements BondModule {
           tokenAuthority,
           payer: this.wallet.publicKey,
           authority: this.wallet.publicKey,
-          treasury: getPublicKey('treasury'),
+          treasury: new web3.PublicKey(treasury),
           systemProgram: web3.SystemProgram.programId,
           tokenProgram: TOKEN_PROGRAM_ID,
           clock: web3.SYSVAR_CLOCK_PUBKEY,
@@ -270,27 +285,56 @@ export class SolanaBond implements BondModule {
     // ).execute();
   };
 
-  getBondPayout({ value }: GetBondPayoutOptions) {
-    console.log({ value });
-    return Promise.resolve();
-  }
+  // getBondPayout({ value }: GetBondPayoutOptions) {
+  //   console.log({ value });
+  //   return Promise.resolve();
+  // }
 
-  getUserBondBalances({ filterByNetwork = false }: GetUserBondBalancesOptions) {
-    console.log({ filterByNetwork });
-    return Promise.resolve();
-  }
+  // getUserBondBalances({ filterByNetwork = false }: GetUserBondBalancesOptions) {
+  //   console.log({ filterByNetwork });
+  //   return Promise.resolve();
+  // }
 
-  public getBonder = async () => {
+  public getBonder = async (): Promise<any> => {
     return await this.utils.getBonder(this.wallet.publicKey);
   };
 
   public getAllBonders = async (): Promise<any> => {
     try {
+      // const [bonder] = await this.utils.getBonder(this.wallet.publicKey);
+      // // const [bondAccount] = await this.utils.getBondAccount(bond.publicKey);
+      // const [payoutAccount] = await this.utils.getPayoutAccount();
+      // const [tokenAuthority] = await this.utils.getTokenAuthority();
+      // const [daoPayoutAccount] = await this.utils.getDaoPayoutAccount();
+      // const [principalAccount] = await this.utils.getPrincipalAccount();
+      // const [daoPrincipalAccount] = await this.utils.getDaoPrincipalAccount();
+
+      // console.log({
+      //   bonder: bonder.toString(),
+      //   // bondAccount: bondAccount.toString(),
+      //   payoutAccount: payoutAccount.toString(),
+      //   tokenAuthority: tokenAuthority.toString(),
+      //   daoPayoutAccount: daoPayoutAccount.toString(),
+      //   principalAccount: principalAccount.toString(),
+      //   daoPrincipalAccount: daoPrincipalAccount.toString(),
+      //   authority: this.wallet.publicKey.toString(),
+      // });
+
       return Promise.resolve(await this.program.account.bonder.all());
     } catch (e) {
       console.log('error', e);
       return Promise.reject(e);
     }
+  };
+
+  public getTreasuryInfo = async (_treasury: string): Promise<any> => {
+    return Promise.resolve(
+      partners.find(({ treasury }) => treasury === _treasury),
+    );
+  };
+
+  public getAllPartners = async (): Promise<any> => {
+    return Promise.resolve(partners.map(({ treasury }) => treasury));
   };
 
   private isUserPurchasedBond = async (
@@ -300,36 +344,52 @@ export class SolanaBond implements BondModule {
       this.wallet.publicKey,
       { mint: nftMint },
     );
-    console.log('this.wallet', this.wallet.publicKey.toString());
-    console.log('account', account);
+    // console.log('this.wallet', this.wallet.publicKey.toString());
+    // console.log('account', account);
     return account.value.length > 0;
+  };
+
+  public getPrincipalTokenBalanceForUser = async (
+    token: string,
+  ): Promise<any> => {
+    const mint = new web3.PublicKey(token);
+    const { value } = await this.connection.getParsedTokenAccountsByOwner(
+      this.wallet.publicKey,
+      { mint },
+    );
+    return Promise.resolve(value);
   };
 
   public getUserBondInfo = async (): Promise<any> => {
     try {
-      console.log('account', this.program.account);
       const allBonds = await this.program.account.bond.all();
-      const [bonder] = await this.utils.getBonder(this.wallet.publicKey);
-
-      const userBonds = await Promise.all(
-        allBonds
-          .filter(
+      const userBonds = partners
+        .map(({ bonder }: any) =>
+          allBonds.filter(
             ({ account }) => account.bonder.toString() === bonder.toString(),
-          )
-          .map(async (bond: any): Promise<any> => {
-            return (await this.isUserPurchasedBond(bond.account.nftMint))
+          ),
+        )
+        .flat()
+        .map(async (bond: any) => {
+          const { treasury }: any = partners.find(
+            ({ bonder }: any) => bonder === bond.account.bonder.toString(),
+          );
+          bond.account.treasury = treasury;
+          return Promise.resolve(
+            (await this.isUserPurchasedBond(bond.account.nftMint))
               ? bond
-              : false;
-          }),
-      );
-      return Promise.resolve(userBonds.filter(Boolean));
+              : false,
+          );
+        });
+      const results = await Promise.all(userBonds);
+      return Promise.resolve(results.filter(Boolean));
     } catch (e) {
       return Promise.reject([]);
     }
   };
 
-  getBondCalculations({ bond }: Options) {
-    console.log({ bond });
-    return Promise.resolve();
-  }
+  // getBondCalculations({ bond }: Options) {
+  //   console.log({ bond });
+  //   return Promise.resolve();
+  // }
 }

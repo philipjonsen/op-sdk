@@ -26,7 +26,8 @@
     "next-fonts": "^1.5.1",
     "react": "18.0.0",
     "react-copy-to-clipboard": "^5.1.0",
-    "react-dom": "18.0.0"
+    "react-dom": "18.0.0",
+    "react-identicons": "^1.2.5"
   },
   "devDependencies": {
     "@ssen/eslint-config": "^2.0.1",
