@@ -53,7 +53,8 @@ a {
 .wallet-adapter-button.connect {
   margin-left: 10px;
   color: #fafafb;
-  background: linear-gradient(237.43deg, #2b313d -12.81%, #171a20 132.72%);
+  background: hsl(228 8% 23% / 0.4);
+  /* background: linear-gradient(237.43deg, #2b313d -12.81%, #171a20 132.72%); */
 }
 
 .bond-card {
@@ -63,7 +64,8 @@ a {
   padding: 20px 20px 20px;
   margin-bottom: 15px;
   border-radius: 6px;
-  background: linear-gradient(237.43deg, #2b313d -12.81%, #171a20 132.72%);
+  background: hsl(228 8% 23% / 0.4);
+  /* background: linear-gradient(237.43deg, #2b313d -12.81%, #171a20 132.72%); */
 }
 
 .bond {
@@ -88,6 +90,39 @@ a {
   margin: 0 auto;
 }
 
+.bond-btn {
+  cursor: pointer;
+  width: 90px;
+  padding: 7px;
+  background: #f8cc82;
+  border: 1px solid #f8cc82;
+  border-radius: 3px;
+  color: #000;
+  font-size: 16px;
+}
+
+.bond-btn-tertiary {
+  width: 100px;
+  font-size: 15px;
+  border: 1px solid #f8cc82;
+  background: transparent;
+  color: #f8cc82;
+}
+
 .identicon {
   border-radius: 50%;
+}
+
+.prog-bar {
+  width: 96px;
+  height: 4px;
+  border-radius: 5px;
+  margin-top: 10px;
+  background-color: #253449;
+  text-align: left;
+}
+
+.prog-bar-inner {
+  height: 4px;
+  border-radius: 5px;
 }

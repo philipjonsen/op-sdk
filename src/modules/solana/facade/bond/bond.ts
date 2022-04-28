@@ -28,7 +28,6 @@ import {
 } from 'src/core/types';
 import idl from '../../idl/olympuspro_sol.json';
 import SolanaUtils from '../../utils';
-import { partners } from '../../partners';
 import { SolanaModuleConfig } from '../..';
 
 export interface GetBondInfoOption extends QueryOption {
@@ -57,6 +56,12 @@ export class SolanaBond implements BondModule {
     this.program = new Program(idl as any, PROGRAM_ID, this.provider);
     this.utils = new SolanaUtils(this.program);
   }
+
+  // todo - replace localhost api with real api
+  private fetchAllPartners = async (): Promise<any> =>
+    await fetch('http://localhost:3000/api/partners')
+      .then((response) => response.json())
+      .then((data) => data);
 
   private createAndGetTokenAccount = async (
     connection: web3.Connection,
@@ -227,6 +232,7 @@ export class SolanaBond implements BondModule {
     );
     const nftToken = account.value[0].pubkey;
     const [bonder] = await this.utils.getBonder(treasury, principalToken);
+
     const [bondAccount] = await this.utils.getBondAccount(options.bond);
     const [tokenAuthority] = await this.utils.getTokenAuthority(treasury);
 
@@ -285,56 +291,52 @@ export class SolanaBond implements BondModule {
     // ).execute();
   };
 
-  // getBondPayout({ value }: GetBondPayoutOptions) {
-  //   console.log({ value });
-  //   return Promise.resolve();
-  // }
-
-  // getUserBondBalances({ filterByNetwork = false }: GetUserBondBalancesOptions) {
-  //   console.log({ filterByNetwork });
-  //   return Promise.resolve();
-  // }
+  public getTokenSupply = async (tokenAddress: string): Promise<any> => {
+    return await this.connection.getTokenSupply(
+      new web3.PublicKey(tokenAddress),
+    );
+  };
 
   public getBonder = async (): Promise<any> => {
     return await this.utils.getBonder(this.wallet.publicKey);
   };
 
   public getAllBonders = async (): Promise<any> => {
-    try {
-      // const [bonder] = await this.utils.getBonder(this.wallet.publicKey);
-      // // const [bondAccount] = await this.utils.getBondAccount(bond.publicKey);
-      // const [payoutAccount] = await this.utils.getPayoutAccount();
-      // const [tokenAuthority] = await this.utils.getTokenAuthority();
-      // const [daoPayoutAccount] = await this.utils.getDaoPayoutAccount();
-      // const [principalAccount] = await this.utils.getPrincipalAccount();
-      // const [daoPrincipalAccount] = await this.utils.getDaoPrincipalAccount();
+    const allBonders = await this.program.account.bonder.all();
+    const updatedBonders = allBonders.map((bond) => {
+      const displayName = (bond.account.displayName = bond.account.mint
+        .toString()
+        .substring(0, 6));
+      return { ...bond, displayName };
+    });
+    return Promise.resolve(updatedBonders);
+  };
 
-      // console.log({
-      //   bonder: bonder.toString(),
-      //   // bondAccount: bondAccount.toString(),
-      //   payoutAccount: payoutAccount.toString(),
-      //   tokenAuthority: tokenAuthority.toString(),
-      //   daoPayoutAccount: daoPayoutAccount.toString(),
-      //   principalAccount: principalAccount.toString(),
-      //   daoPrincipalAccount: daoPrincipalAccount.toString(),
-      //   authority: this.wallet.publicKey.toString(),
-      // });
-
-      return Promise.resolve(await this.program.account.bonder.all());
-    } catch (e) {
-      console.log('error', e);
-      return Promise.reject(e);
+  public getSpecificTreasuryData = async (treasury: string): Promise<any> => {
+    const details = await this.program.account.treasury.all();
+    const all = details.find(
+      ({ publicKey }) => publicKey.toString() === treasury,
+    );
+    if (all) {
+      const acc = await this.connection.getTokenAccountBalance(
+        new web3.PublicKey(all.account.payoutToken),
+      );
+      return Promise.resolve(acc);
+    } else {
+      return Promise.resolve([]);
     }
   };
 
   public getTreasuryInfo = async (_treasury: string): Promise<any> => {
+    const partners = await this.fetchAllPartners();
     return Promise.resolve(
-      partners.find(({ treasury }) => treasury === _treasury),
+      partners.find(({ treasury }: any) => treasury === _treasury),
     );
   };
 
   public getAllPartners = async (): Promise<any> => {
-    return Promise.resolve(partners.map(({ treasury }) => treasury));
+    const partners = await this.fetchAllPartners();
+    return Promise.resolve(partners.map(({ treasury }: any) => treasury));
   };
 
   private isUserPurchasedBond = async (
@@ -362,6 +364,7 @@ export class SolanaBond implements BondModule {
 
   public getUserBondInfo = async (): Promise<any> => {
     try {
+      const partners = await this.fetchAllPartners();
       const allBonds = await this.program.account.bond.all();
       const userBonds = partners
         .map(({ bonder }: any) =>
@@ -371,10 +374,12 @@ export class SolanaBond implements BondModule {
         )
         .flat()
         .map(async (bond: any) => {
+          console.log('bond');
           const { treasury }: any = partners.find(
             ({ bonder }: any) => bonder === bond.account.bonder.toString(),
           );
           bond.account.treasury = treasury;
+          console.log('bond.account', bond.account);
           return Promise.resolve(
             (await this.isUserPurchasedBond(bond.account.nftMint))
               ? bond
@@ -387,9 +392,4 @@ export class SolanaBond implements BondModule {
       return Promise.reject([]);
     }
   };
-
-  // getBondCalculations({ bond }: Options) {
-  //   console.log({ bond });
-  //   return Promise.resolve();
-  // }
 }

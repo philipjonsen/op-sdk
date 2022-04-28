@@ -21,15 +21,25 @@ const Bond: NextPage = () => {
 
   useEffect(() => {
     (async () => {
-      const bonds = await sdk.bond.getAllBonders();
-      const treasuryInfo = await sdk.bond.getTreasuryInfo(treasury?.toString());
-      const bondInfo = bonds.find(
-        ({ account }: any) => treasury === account.treasury.toString(),
-      );
-      setBondDetails({
-        ...treasuryInfo,
-        ...bondInfo?.account,
-      });
+      if (treasury) {
+        const bonds = await sdk.bond.getAllBonders();
+        const treasuryInfo = await sdk.bond.getTreasuryInfo(
+          treasury.toString(),
+        );
+
+        const maxPayoutAmount = await sdk.bond.getSpecificTreasuryData(
+          treasury.toString(),
+        );
+        setMaxPayoutToken(maxPayoutAmount.value.uiAmount);
+
+        const bondInfo = bonds.find(
+          ({ account }: any) => treasury === account.treasury.toString(),
+        );
+        setBondDetails({
+          ...treasuryInfo,
+          ...bondInfo?.account,
+        });
+      }
     })();
   }, [treasury]);
 
@@ -40,7 +50,6 @@ const Bond: NextPage = () => {
           bondDetails.principalToken !== '' &&
           bondDetails.principalToken !== undefined
         ) {
-          console.log('bondDetails', bondDetails);
           const details = await sdk.bond.getPrincipalTokenBalanceForUser(
             bondDetails.principalToken,
           );
@@ -55,18 +64,18 @@ const Bond: NextPage = () => {
           bondDetails.payoutToken !== '' &&
           bondDetails.payoutToken !== undefined
         ) {
-          const maxPayoutPercent = new BN(bondDetails.maxPayoutPercent)
-            .div(new BN(Math.pow(10, 3)))
-            .toNumber();
+          // const maxPayoutPercent = new BN(bondDetails.maxPayoutPercent)
+          //   .div(new BN(Math.pow(10, 3)))
+          //   .toNumber();
 
-          const details = await sdk.bond.getTokenSupply(
-            bondDetails.payoutToken,
-          );
-          if (details?.value?.uiAmount) {
-            setMaxPayoutToken(
-              (details.value.uiAmount * maxPayoutPercent) / 100,
-            );
-          }
+          // const details = await sdk.bond.getTokenSupply(
+          //   bondDetails.payoutToken,
+          // );
+          // if (details?.value?.uiAmount) {
+          //   setMaxPayoutToken(
+          //     (details.value.uiAmount * maxPayoutPercent) / 100,
+          //   );
+          // }
         }
       }
     })();
@@ -104,10 +113,11 @@ const Bond: NextPage = () => {
                 bg="white"
                 string={bondDetails.principalToken.toString()}
               />
-              {console.log(
+              {/* {console.log(
                 'principalToken',
                 bondDetails.principalToken.toString(),
               )}
+              {console.log('payoutToken', bondDetails.payoutToken.toString())} */}
             </>
           )}
           <div style={{ marginTop: '10px' }}>You Give</div>
@@ -136,54 +146,65 @@ const Bond: NextPage = () => {
           <div style={{ marginTop: '10px' }}>You Get</div>
         </div>
       </div>
+
       <div style={{ margin: '25px auto 30px', width: '90%' }}>
-        <div style={{ display: 'flex' }}>
-          <div
-            style={{ width: '76%', marginRight: '2%', position: 'relative' }}
-          >
-            <input
+        {principalTokenBalance !== 0 ? (
+          <div style={{ display: 'flex' }}>
+            <div
+              style={{ width: '76%', marginRight: '2%', position: 'relative' }}
+            >
+              <input
+                style={{
+                  width: '100%',
+                  padding: '10px 15px',
+                  borderRadius: '3px',
+                  color: 'white',
+                  background: 'transparent',
+                  outline: 'none',
+                  border: '1px solid silver',
+                }}
+                type="text"
+                value={amount}
+                onInput={(e: any) => setAmount(+e.target.value)}
+              />
+              <span
+                onClick={() => setAmount(principalTokenBalance)}
+                style={{
+                  cursor: 'pointer',
+                  position: 'absolute',
+                  right: '15px',
+                  top: '8px',
+                }}
+              >
+                Max
+              </span>
+            </div>
+            <button className="bond-btn" onClick={() => purchaseBond()}>
+              Bond
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <p
               style={{
-                width: '100%',
-                padding: '10px 15px',
-                borderRadius: '3px',
-                color: 'white',
-                background: 'transparent',
-                outline: 'none',
-                border: '1px solid silver',
-              }}
-              type="text"
-              value={amount}
-              onInput={(e: any) => setAmount(+e.target.value)}
-            />
-            <span
-              onClick={() => setAmount(principalTokenBalance)}
-              style={{
-                cursor: 'pointer',
-                position: 'absolute',
-                right: '15px',
-                top: '8px',
+                color: '#8E9DBA',
+                fontSize: '16px',
+                textAlign: 'center',
+                lineHeight: 1.5,
               }}
             >
-              Max
-            </span>
+              We could not detect the principal token in your wallet!!
+              <br />
+              {bondDetails.principalToken && (
+                <span style={{ fontSize: '13px', color: 'white' }}>
+                  {bondDetails.principalToken.toString()}
+                </span>
+              )}
+            </p>
           </div>
-          <button
-            style={{
-              cursor: 'pointer',
-              width: '22%',
-              padding: '7px',
-              background: '#F8CC82',
-              border: '1px solid #F8CC82',
-              borderRadius: '3px',
-              color: '#000',
-              fontSize: '16px',
-            }}
-            onClick={() => purchaseBond()}
-          >
-            Bond
-          </button>
-        </div>
+        )}
       </div>
+
       <div style={{ margin: '30px auto 0', width: '90%' }}>
         {bondDetails?.principalToken && (
           <div

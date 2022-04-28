@@ -35,3 +35,27 @@ Output: SOL / MEAN bond created.
 -> User purchases SOL / MEAN bond on OP (Amount 20 SOL)
 -> User claims bond instantly (0 days vesting)
 -> User receives 20 MEAN.
+
+## ROI on frontend is calculated as follows:
+
+Bond Price: 70.55
+Market Price: 72.52
+
+// (Market Price - Bond Price ) / Bond Price
+Discount = (72.52 - 70.55) / 70.55 = 0.02792345854004251
+
+// Convert to percentage based
+Discount * 100 = 2.792345854004251%
+
+Need to find out the bond price and market price of the payout token...
+
+---
+
+## Finding Max Payout Value for bond screen...
+
+maxPayoutPercent = 100%
+payoutMintSupply = 10000
+
+// (Payout Mint Supply _ Max Payout Percent) / 100
+(10000 * 100) / 100 = 10,000 tokens
+(10000 * 75) / 100 = 7,5000 tokens

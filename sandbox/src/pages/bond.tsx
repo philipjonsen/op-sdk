@@ -8,16 +8,20 @@ import { Fragment, useEffect, useState } from 'react';
 import { LinkIcon } from '../components/LinkIcon';
 import { getFormattedDate, shorten } from '../utils/solana';
 import useSolanaWorkspace from '../hooks/useSolanaWorkspace';
+import ProgressBar from '../components/ProgressBar';
 
 const Bond: NextPage = () => {
   const router = useRouter();
   const { sdk, wallet } = useSolanaWorkspace();
   const [allBonds, setAllBonds] = useState([]);
   const [userBonds, setUserBonds] = useState([]);
+  const [maxPayoutToken, setMaxPayoutToken] = useState<number>(0);
 
   useEffect(() => {
-    getUserBonds();
-  }, [wallet]);
+    if (wallet && allBonds) {
+      getUserBonds();
+    }
+  }, [wallet, allBonds]);
 
   useEffect(() => {
     (async () => {
@@ -33,10 +37,14 @@ const Bond: NextPage = () => {
           .map(async (bond: any) => {
             const { bonder, treasury, payoutToken } =
               await sdk.bond.getTreasuryInfo(bond.account.treasury.toString());
+            const maxPayoutAmount = await sdk.bond.getSpecificTreasuryData(
+              treasury,
+            );
             bondsList.push({
               bonder,
               treasury,
               payoutToken,
+              displayName: bond.displayName,
               maxDebt: bond.account.maxDebt,
               vestingTerm: bond.account.vestingTerm,
               principalToken: bond.account.mint,
@@ -44,6 +52,7 @@ const Bond: NextPage = () => {
               minimumPrice: bond.account.minimumPrice,
               totalBonded: bond.account.totalBonded,
               totalDebt: bond.account.totalDebt,
+              maxPayoutAmount: maxPayoutAmount.value.uiAmount,
             });
           }),
       );
@@ -55,6 +64,13 @@ const Bond: NextPage = () => {
     if (wallet.connected) {
       setUserBonds(await sdk.bond.getUserBondInfo());
     }
+  };
+
+  const getBondDisplayName = (bonder: any) => {
+    const all: any = allBonds.find(
+      (bond: any) => bond.bonder === bonder,
+    );
+    return all?.displayName || '';
   };
 
   const redeemBond = async (bond: any) => {
@@ -72,11 +88,25 @@ const Bond: NextPage = () => {
     getUserBonds();
   };
 
+  const getMaxDebtForBond = async (treasury: any) => {
+    const maxPayoutAmount = await sdk.bond.getSpecificTreasuryData(
+      treasury.toString(),
+    );
+    return maxPayoutAmount.value.uiAmount;
+  };
+
   return (
     <main style={{ margin: '20px 0' }}>
-      {/* {console.log('userBonds', userBonds)} */}
       {userBonds.length > 0 && wallet.publicKey ? (
-        <div className="bond-card">
+        <div
+          className="bond-card"
+          style={{
+            padding: '20px 72px',
+            maxWidth: '1024px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+          }}
+        >
           {userBonds
             ?.sort(
               (a: any, b: any) =>
@@ -109,7 +139,8 @@ const Bond: NextPage = () => {
                       target="_blank"
                     >
                       <span style={{ marginRight: '4px', fontSize: '15px' }}>
-                        {shorten(bond.publicKey.toString())}
+                        {/* {shorten(bond.publicKey.toString())} */}
+                        {getBondDisplayName(bond.account.bonder.toString())}
                       </span>
                       <LinkIcon />
                     </a>
@@ -163,36 +194,116 @@ const Bond: NextPage = () => {
         </div>
       ) : null}
 
-      <div
-        style={{
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-        }}
-      >
-        {allBonds
-          ?.sort((a: any, b: any) => a.treasury - b.treasury)
-          .map((bond: any, i) => (
-            <div key={i} className="bond-card">
-              <p>Treasury: {shorten(bond.treasury, 8)}</p>
-              <p>Bonder: {shorten(bond.bonder, 8)}</p>
-              <p>
-                Principal Token:
-                <Identicon
-                  size={50}
-                  count={5}
-                  bg="white"
-                  string={bond.principalToken}
-                />
-              </p>
-              <Identicon
-                size={50}
-                count={5}
-                bg="white"
-                string={bond.payoutToken}
-              />
-              <p>
+      {allBonds.length ? (
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+          }}
+        >
+          <div
+            className="bond-card"
+            style={{
+              padding: '30px 72px',
+              maxWidth: '1024px',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                fontSize: '14px',
+                marginBottom: '20px',
+                fontWeight: 500,
+              }}
+            >
+              <div style={{ width: '35%' }}>Bonds</div>
+              <div style={{ width: '20%', textAlign: 'left' }}>
+                Payout Asset
+              </div>
+              <div style={{ width: '15%', textAlign: 'left' }}>ROI</div>
+              <div style={{ width: '15%', textAlign: 'left' }}>TBV</div>
+              <div style={{ width: '15%', textAlign: 'left' }}>&nbsp;</div>
+            </div>
+            {allBonds
+              ?.sort((a: any, b: any) => a.treasury - b.treasury)
+              .map((bond: any, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '15px',
+                  }}
+                >
+                  {/* <p>Treasury: {shorten(bond.treasury, 8)}</p> */}
+                  {/* <p>Bonder: {shorten(bond.bonder, 8)}</p> */}
+                  <div
+                    style={{
+                      width: '35%',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Identicon
+                      size={30}
+                      count={5}
+                      bg="white"
+                      string={bond.principalToken}
+                    />
+                    <span style={{ fontSize: '16px', marginLeft: '25px' }}>
+                      {bond.displayName}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      width: '20%',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <div style={{ position: 'relative', width: '40px' }}>
+                      <Identicon
+                        size={30}
+                        count={5}
+                        bg="white"
+                        string={bond.payoutToken}
+                      />
+                      <div
+                        style={{
+                          fontSize: '9px',
+                          marginTop: '-1px',
+                          color: 'rgb(188, 208, 248)',
+                          textShadow:
+                            'rgb(0 0 0) -0.5px -0.5px 0px, rgb(0 0 0) 0.5px -0.5px 0px, rgb(0 0 0) -0.5px 0.5px 0px, rgb(0 0 0) 0.5px 0.5px 0px, rgb(0 0 0) 0.5px 0px 0px, rgb(0 0 0) -0.5px 0px 0px, rgb(0 0 0) 0px 0.5px 0px, rgb(0 0 0) 0px -0.5px 0px, rgb(0 0 0) 0px 0px 0.5px',
+                        }}
+                      >
+                        {shorten(bond.payoutToken.toString(), 3)}
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ width: '15%', textAlign: 'left' }}>0.00%</div>
+                  <div style={{ width: '15%', textAlign: 'left' }}>
+                    {new Intl.NumberFormat('en-US', {
+                      style: 'currency',
+                      currency: 'USD',
+                      maximumFractionDigits: 0,
+                      minimumFractionDigits: 0,
+                    }).format(new BN(bond.totalBonded).toNumber())}
+                    <ProgressBar
+                      currentDebt={new BN(bond.totalBonded).toNumber()}
+                      maxDebt={bond.maxPayoutAmount}
+                    />
+                    {console.log('ddddd', bond)}
+                  </div>
+                  {/* <p>
                 Principal Token: {shorten(bond.principalToken.toString(), 3)}
               </p>
               <p>Payout Token: {shorten(bond.payoutToken, 3)}</p>
@@ -207,22 +318,27 @@ const Bond: NextPage = () => {
               </p>
               <p>Vesting Term: {new BN(bond.vestingTerm).toString()}</p>
               <p>Total Debt: {new BN(bond.totalDebt).toString()}</p>
-              <p>Total Bonded: {new BN(bond.totalBonded).toString()}</p>
-              <button
-                onClick={() =>
-                  router.push({
-                    pathname: `/bond/${bond.bonder}`,
-                    query: {
-                      treasury: bond.treasury,
-                    },
-                  })
-                }
-              >
-                Bond
-              </button>
-            </div>
-          ))}
-      </div>
+              <p>Total Bonded: {new BN(bond.totalBonded).toString()}</p> */}
+                  <div style={{ width: '15%', textAlign: 'center' }}>
+                    <button
+                      className="bond-btn bond-btn-tertiary"
+                      onClick={() =>
+                        router.push({
+                          pathname: `/bond/${bond.bonder}`,
+                          query: {
+                            treasury: bond.treasury,
+                          },
+                        })
+                      }
+                    >
+                      Bond
+                    </button>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 };
