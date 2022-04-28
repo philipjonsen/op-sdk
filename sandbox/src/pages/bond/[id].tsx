@@ -101,7 +101,7 @@ const Bond: NextPage = () => {
   };
 
   return (
-    <div className="bond bond-card">
+    <div className="bond bond-card" style={{ top: '50%', transform: 'translate(-50%, -40%)' }}>
       <h2 className="bond-title">{id && shorten(id.toString(), 12)}</h2>
       <div className="bond-content">
         <div style={{ height: '80px' }}>

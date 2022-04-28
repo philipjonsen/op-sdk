@@ -7,8 +7,8 @@ import { Fragment, useEffect, useState } from 'react';
 
 import { LinkIcon } from '../components/LinkIcon';
 import { getFormattedDate, shorten } from '../utils/solana';
-import useSolanaWorkspace from '../hooks/useSolanaWorkspace';
 import ProgressBar from '../components/ProgressBar';
+import useSolanaWorkspace from '../hooks/useSolanaWorkspace';
 
 const Bond: NextPage = () => {
   const router = useRouter();
@@ -67,9 +67,7 @@ const Bond: NextPage = () => {
   };
 
   const getBondDisplayName = (bonder: any) => {
-    const all: any = allBonds.find(
-      (bond: any) => bond.bonder === bonder,
-    );
+    const all: any = allBonds.find((bond: any) => bond.bonder === bonder);
     return all?.displayName || '';
   };
 
@@ -101,12 +99,32 @@ const Bond: NextPage = () => {
         <div
           className="bond-card"
           style={{
-            padding: '20px 72px',
+            padding: '30px 72px 10px',
             maxWidth: '1024px',
             marginLeft: 'auto',
             marginRight: 'auto',
           }}
         >
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: '16px',
+              marginBottom: '20px',
+              fontWeight: 700,
+              color: '#fff',
+            }}
+          >
+            <div style={{ width: '20%' }}>My Bonds</div>
+            <div style={{ width: '25%', textAlign: 'left' }}>Claimable</div>
+            <div style={{ width: '15%', textAlign: 'center' }}>Pending</div>
+            <div style={{ width: '25%', textAlign: 'center' }}>
+              Vestige Lockup
+            </div>
+            <div style={{ width: '15%', textAlign: 'left' }}>&nbsp;</div>
+          </div>
           {userBonds
             ?.sort(
               (a: any, b: any) =>
@@ -118,18 +136,17 @@ const Bond: NextPage = () => {
                   style={{
                     display: 'flex',
                     flexDirection: 'row',
-                    justifyContent: 'space-between',
                     alignItems: 'center',
-                    color: '#FCFCFC',
+                    color: '#dcdcdc',
                     overflow: 'hidden',
                     margin: '20px 0',
                     fontWeight: 400,
-                    fontSize: '15px',
+                    fontSize: '14px',
                   }}
                 >
                   <div
                     style={{
-                      width: '30%',
+                      width: '20%',
                       overflow: 'hidden',
                     }}
                   >
@@ -147,7 +164,7 @@ const Bond: NextPage = () => {
                   </div>
                   <div
                     style={{
-                      width: '30%',
+                      width: '25%',
                       overflow: 'hidden',
                     }}
                   >
@@ -155,33 +172,29 @@ const Bond: NextPage = () => {
                   </div>
                   <div
                     style={{
-                      width: '20%',
+                      width: '15%',
                       overflow: 'hidden',
-                    }}
-                  >
-                    {getFormattedDate(+new BN(bond.account.vestingStart, 16))}
-                  </div>
-                  <div
-                    style={{
-                      width: '10%',
                       textAlign: 'center',
                     }}
                   >
-                    {new BN(bond.account.vestingTerm, 16).toString()}
+                    N/A
                   </div>
-                  <div style={{ width: '10%', marginLeft: '20px' }}>
+                  <div
+                    style={{
+                      width: '25%',
+                      textAlign: 'center',
+                    }}
+                  >
+                    {new BN(bond.account.vestingTerm, 16).toString()} days
+                  </div>
+                  <div style={{ width: '15%', textAlign: 'center' }}>
                     <button
+                      className="bond-btn"
                       style={{
-                        color: '#333333',
-                        height: '30px',
-                        border: 0,
                         fontWeight: 500,
                         fontSize: '15px',
-                        borderRadius: '3px',
-                        backgroundColor: '#F8CC82',
-                        width: '100%',
-                        cursor: 'pointer',
-                        textAlign: 'center',
+                        height: '30px',
+                        padding: 0
                       }}
                       onClick={() => redeemBond(bond)}
                     >
@@ -217,10 +230,11 @@ const Bond: NextPage = () => {
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center',
+                color: '#fff',
                 justifyContent: 'space-between',
-                fontSize: '14px',
-                marginBottom: '20px',
-                fontWeight: 500,
+                fontSize: '16px',
+                marginBottom: '30px',
+                fontWeight: 700,
               }}
             >
               <div style={{ width: '35%' }}>Bonds</div>
@@ -232,7 +246,7 @@ const Bond: NextPage = () => {
               <div style={{ width: '15%', textAlign: 'left' }}>&nbsp;</div>
             </div>
             {allBonds
-              ?.sort((a: any, b: any) => a.treasury - b.treasury)
+              .sort((a: any, b: any) => a.treasury.localeCompare(b.treasury))
               .map((bond: any, i) => (
                 <div
                   key={i}
@@ -280,7 +294,7 @@ const Bond: NextPage = () => {
                         style={{
                           fontSize: '9px',
                           marginTop: '-1px',
-                          color: 'rgb(188, 208, 248)',
+                          color: '#fff',
                           textShadow:
                             'rgb(0 0 0) -0.5px -0.5px 0px, rgb(0 0 0) 0.5px -0.5px 0px, rgb(0 0 0) -0.5px 0.5px 0px, rgb(0 0 0) 0.5px 0.5px 0px, rgb(0 0 0) 0.5px 0px 0px, rgb(0 0 0) -0.5px 0px 0px, rgb(0 0 0) 0px 0.5px 0px, rgb(0 0 0) 0px -0.5px 0px, rgb(0 0 0) 0px 0px 0.5px',
                         }}
